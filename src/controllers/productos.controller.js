@@ -1,71 +1,86 @@
-const productos = require('../data/productos.data');
+const Producto = require('../models/Producto');
 
-const obtenerProductos = (req, res) => {
-  res.json(productos);
+const obtenerProductos = async (req, res) => {
+  try {
+    const productos = await Producto.find({ activo: true });
+    res.status(200).json(productos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener productos' });
+  }
 };
 
-const obtenerProductoPorId = (req, res) => {
-  const id = parseInt(req.params.id);
+const obtenerProductoPorId = async (req, res) => {
+  try {
+    const producto = await Producto.findOne({ _id: req.params.id, activo: true });
 
-  const producto = productos.find(p => p.id === id);
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
 
-  if (!producto) {
-    return res.status(404).json({ error: 'Producto no encontrado' });
+    res.status(200).json(producto);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener producto' });
   }
-
-  res.json(producto);
 };
 
-const crearProducto = (req, res) => {
-  const { nombre, precio } = req.body;
+const crearProducto = async (req, res) => {
+  try {
+    const { nombre, precio, categoria, descripcion } = req.body;
 
-  if (!nombre || !precio) {
-    return res.status(400).json({ error: 'Nombre y precio son obligatorios' });
+    if (!nombre || precio === undefined || !categoria) {
+      return res.status(400).json({ error: 'Nombre, precio y categoria son obligatorios' });
+    }
+
+    const nuevoProducto = new Producto({
+      nombre,
+      precio,
+      categoria,
+      descripcion
+    });
+
+    await nuevoProducto.save();
+    res.status(201).json(nuevoProducto);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear producto' });
   }
-
-  const nuevoProducto = {
-    id: productos.length + 1,
-    nombre,
-    precio
-  };
-
-  productos.push(nuevoProducto);
-
-  res.status(201).json(nuevoProducto);
 };
 
-const actualizarProducto = (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = productos.findIndex(p => p.id === id);
+const actualizarProducto = async (req, res) => {
+  try {
+    const { nombre, precio, categoria, descripcion } = req.body;
 
-  if (index === -1) {
-    return res.status(404).json({ error: 'Producto no encontrado para actualizar' });
+    const producto = await Producto.findOneAndUpdate(
+      { _id: req.params.id, activo: true },
+      { nombre, precio, categoria, descripcion },
+      { new: true, runValidators: true }
+    );
+
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado para actualizar' });
+    }
+
+    res.status(200).json(producto);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar producto' });
   }
-
-
-  const { nombre, precio } = req.body;
-
-  productos[index] = {
-    id,
-    nombre: nombre !== undefined ? nombre : productos[index].nombre,
-    precio: precio !== undefined ? precio : productos[index].precio
-  };
-
-  res.status(200).json(productos[index]);
 };
 
-const eliminarProducto = (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = productos.findIndex(p => p.id === id);
+const eliminarProducto = async (req, res) => {
+  try {
+    const producto = await Producto.findOneAndUpdate(
+      { _id: req.params.id, activo: true },
+      { activo: false },
+      { new: true }
+    );
 
-  if (index === -1) {
-    return res.status(404).json({ error: 'Producto no encontrado para eliminar' });
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado para eliminar' });
+    }
+
+    res.status(200).json({ mensaje: 'Producto dado de baja logicamente', producto });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al dar de baja producto' });
   }
-
-
-  const productoEliminado = productos.splice(index, 1);
-
-  res.status(200).json(productoEliminado[0]);
 };
 
 module.exports = {
