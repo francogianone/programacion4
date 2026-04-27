@@ -1,0 +1,24 @@
+:root {
+  --primary: #005b82;
+  --primary-hover: #004563;
+  --bg-color: #ffffff;
+  --card-bg: #ffffff;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --border: #e0e0e0;
+  --btn-green: #388e3c;
+  --btn-green-hover: #2e7d32;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f7f7f7;
+  color: var(--text-main);
+  line-height: 1.5;
+}
