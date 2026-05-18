@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const Usuario = require('../models/Usuario');
 
 const registrarUsuario = async (req, res) => {
@@ -13,10 +14,12 @@ const registrarUsuario = async (req, res) => {
       return res.status(400).json({ error: 'El email ya esta registrado' });
     }
 
+    const hash = await bcrypt.hash(contrasena, 10);
+
     const nuevoUsuario = new Usuario({
       nombre,
       email,
-      contrasena,
+      contrasena: hash,
       rol
     });
 
