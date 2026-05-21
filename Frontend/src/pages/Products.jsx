@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/axios';
 import ProductCard from '../components/Cards/ProductCard';
 import './Products.css';
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -11,7 +9,7 @@ function Products() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/productos`)
+    api.get('/productos')
       .then(res => {
         setProducts(res.data);
         setLoading(false);
@@ -22,11 +20,12 @@ function Products() {
       });
   }, []);
 
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <div className="loading">Cargando catálogo...</div>;
+  if (error) return <div className="error-msg">{error}</div>;
 
   return (
-    <div>
+    <div className="page-container">
+      <h1 className="page-title">Nuestro Catálogo</h1>
       <div className="products-container">
         {products.map(product => (
           <ProductCard

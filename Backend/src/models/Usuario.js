@@ -25,7 +25,9 @@ const usuarioSchema = new mongoose.Schema({
   activo: {
     type: Boolean,
     default: true
-  }
+  },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date
 }, { timestamps: true });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

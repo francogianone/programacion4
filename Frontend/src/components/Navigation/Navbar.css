@@ -1,24 +1,104 @@
 .navbar {
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #2f71ff;
-  color: white;
-  padding: 15px 30px;
 }
 
-.nav-links {
-  display: flex;
-  gap: 20px;
-  list-style: none;
-  
-}
-
-.nav-links li a {
-  color: inherit;
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c3e50;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.cart {
-  font-size: 20px;
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-menu a {
+  text-decoration: none;
+  color: #4a5568;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar-menu a:hover {
+  color: #3498db;
+}
+
+.admin-link {
+  color: #e53e3e !important;
+  font-weight: 700 !important;
+}
+
+.cart-link {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f7fafc;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+}
+
+.cart-count {
+  background: #3498db;
+  color: white;
+  padding: 0.1rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+}
+
+.btn-login, .btn-register, .btn-logout {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn-login {
+  color: #3498db !important;
+  background: transparent;
+}
+
+.btn-register {
+  background: #3498db;
+  color: white !important;
+}
+
+.btn-register:hover {
+  background: #2980b9;
+}
+
+.btn-logout {
+  background: transparent;
+  color: #e53e3e;
+}
+
+.btn-logout:hover {
+  text-decoration: underline;
 }

@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const { proteger } = require('../middlewares/auth.middleware');
+const { admin } = require('../middlewares/role.middleware');
 
 const {
   obtenerProductos,
@@ -11,8 +13,10 @@ const {
 
 router.get('/', obtenerProductos);
 router.get('/:id', obtenerProductoPorId);
-router.post('/', crearProducto);
-router.put('/:id', actualizarProducto);
-router.delete('/:id', eliminarProducto);
+
+// Rutas protegidas solo para admin
+router.post('/', proteger, admin, crearProducto);
+router.put('/:id', proteger, admin, actualizarProducto);
+router.delete('/:id', proteger, admin, eliminarProducto);
 
 module.exports = router;
