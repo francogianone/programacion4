@@ -9,6 +9,15 @@ const obtenerProductos = async (req, res) => {
   }
 };
 
+const obtenerTodosLosProductosAdmin = async (req, res) => {
+  try {
+    const productos = await Producto.find({});
+    res.status(200).json(productos);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener todos los productos' });
+  }
+};
+
 const obtenerProductoPorId = async (req, res) => {
   try {
     const producto = await Producto.findOne({ _id: req.params.id, activo: true });
@@ -84,10 +93,30 @@ const eliminarProducto = async (req, res) => {
   }
 };
 
+const restaurarProducto = async (req, res) => {
+  try {
+    const producto = await Producto.findOneAndUpdate(
+      { _id: req.params.id, activo: false },
+      { activo: true },
+      { new: true }
+    );
+
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto inactivo no encontrado para restaurar' });
+    }
+
+    res.status(200).json({ mensaje: 'Producto restaurado exitosamente', producto });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al restaurar producto' });
+  }
+};
+
 module.exports = {
   obtenerProductos,
+  obtenerTodosLosProductosAdmin,
   obtenerProductoPorId,
   crearProducto,
   actualizarProducto,
-  eliminarProducto
+  eliminarProducto,
+  restaurarProducto
 };
