@@ -75,109 +75,13 @@ Aplicacion disponible en `http://localhost:5173`
 
 ## Endpoints disponibles
 
-### Productos
+La documentación detallada de la API, junto con los métodos HTTP, rutas, parámetros y respuestas JSON de todos los módulos (Auth, Productos, Carrito, Órdenes, Usuarios) se encuentra en el archivo [DOCUMENTACION_FINAL.md](./DOCUMENTACION_FINAL.md).
 
-| Metodo | URL | Descripcion |
-|--------|-----|-------------|
-| GET | /api/productos | Listar productos activos |
-| GET | /api/productos/:id | Obtener producto por id |
-| POST | /api/productos | Crear producto |
-| PUT | /api/productos/:id | Editar producto |
-| DELETE | /api/productos/:id | Baja logica |
+## Instalación y Ejecución Rápida
 
-### Usuarios
-
-| Metodo | URL | Descripcion |
-|--------|-----|-------------|
-| POST | /api/usuarios | Registrar usuario |
-
-### Carrito
-
-| Metodo | URL | Descripcion |
-|--------|-----|-------------|
-| POST | /api/carritos | Crear carrito |
-| POST | /api/carritos/:id/productos | Agregar producto al carrito |
-
-## Ejemplos de requests
-
-### Crear producto
-
-```
-POST http://localhost:3000/api/productos
-Content-Type: application/json
-
-{
-  "nombre": "Cien años de soledad",
-  "precio": 2500,
-  "categoria": "Literatura latinoamericana",
-  "descripcion": "Gabriel García Márquez. La historia de la familia Buendía en Macondo."
-}
-```
-
-### Listar todos los productos
-
-```
-GET http://localhost:3000/api/productos
-```
-
-### Obtener producto por id
-
-```
-GET http://localhost:3000/api/productos/<_id>
-```
-
-### Editar producto
-
-```
-PUT http://localhost:3000/api/productos/<_id>
-Content-Type: application/json
-
-{
-  "nombre": "Cien años de soledad",
-  "precio": 2800,
-  "categoria": "Literatura latinoamericana",
-  "descripcion": "Edicion actualizada."
-}
-```
-
-### Baja logica de producto
-
-```
-DELETE http://localhost:3000/api/productos/<_id>
-```
-
-### Registrar usuario
-
-```
-POST http://localhost:3000/api/usuarios
-Content-Type: application/json
-
-{
-  "nombre": "Juan Perez",
-  "email": "juan@email.com",
-  "contrasena": "123456"
-}
-```
-
-### Crear carrito
-
-```
-POST http://localhost:3000/api/carritos
-Content-Type: application/json
-
-{
-  "usuario": "<_id del usuario>"
-}
-```
-
-### Agregar producto al carrito
-
-```
-POST http://localhost:3000/api/carritos/<_id del carrito>/productos
-Content-Type: application/json
-
-{
-  "productoId": "<_id del producto>",
-  "cantidad": 2
-}
-```
+1. Instalar dependencias en ambas carpetas:
+   - En `Backend/`: ejecutar `npm install`
+   - En `Frontend/`: ejecutar `npm install`
+2. Configurar variables de entorno (`.env`) en ambas carpetas guiándose con los archivos `.env.example`.
+3. Iniciar Backend: `npm run dev` en la carpeta Backend (corre en puerto 3000).
+4. Iniciar Frontend: `npm run dev` en la carpeta Frontend (corre en puerto 5173).
