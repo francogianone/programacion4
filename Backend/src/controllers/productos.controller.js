@@ -25,7 +25,7 @@ const obtenerProductoPorId = async (req, res) => {
 
 const crearProducto = async (req, res) => {
   try {
-    const { nombre, precio, categoria, descripcion } = req.body;
+    const { nombre, precio, categoria, descripcion, stock } = req.body;
 
     if (!nombre || precio === undefined || !categoria) {
       return res.status(400).json({ error: 'Nombre, precio y categoria son obligatorios' });
@@ -35,7 +35,8 @@ const crearProducto = async (req, res) => {
       nombre,
       precio,
       categoria,
-      descripcion
+      descripcion,
+      stock: stock !== undefined ? Number(stock) : 0
     });
 
     await nuevoProducto.save();
@@ -47,11 +48,11 @@ const crearProducto = async (req, res) => {
 
 const actualizarProducto = async (req, res) => {
   try {
-    const { nombre, precio, categoria, descripcion } = req.body;
+    const { nombre, precio, categoria, descripcion, stock } = req.body;
 
     const producto = await Producto.findOneAndUpdate(
       { _id: req.params.id, activo: true },
-      { nombre, precio, categoria, descripcion },
+      { nombre, precio, categoria, descripcion, stock: stock !== undefined ? Number(stock) : 0 },
       { new: true, runValidators: true }
     );
 

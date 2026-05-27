@@ -4,7 +4,7 @@ import './Admin.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const camposVacios = { nombre: '', precio: '', categoria: '', descripcion: '' };
+const camposVacios = { nombre: '', precio: '', categoria: '', descripcion: '', stock: '' };
 
 function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
   const [form, setForm] = useState(
@@ -13,7 +13,8 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           nombre: productoInicial.nombre,
           precio: productoInicial.precio,
           categoria: productoInicial.categoria,
-          descripcion: productoInicial.descripcion || ''
+          descripcion: productoInicial.descripcion || '',
+          stock: productoInicial.stock !== undefined ? productoInicial.stock : 0
         }
       : camposVacios
   );
@@ -31,14 +32,16 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
       if (modo === 'crear') {
         await axios.post(`${API_URL}/api/productos`, {
           ...form,
-          precio: Number(form.precio)
+          precio: Number(form.precio),
+          stock: Number(form.stock || 0)
         });
         alert('Producto creado correctamente');
         setForm(camposVacios);
       } else {
         await axios.put(`${API_URL}/api/productos/${productoInicial._id}`, {
           ...form,
-          precio: Number(form.precio)
+          precio: Number(form.precio),
+          stock: Number(form.stock || 0)
         });
         alert('Producto actualizado correctamente');
       }
@@ -102,6 +105,19 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           rows={3}
           value={form.descripcion}
           onChange={handleChange}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="stock">Stock</label>
+        <input
+          id="stock"
+          name="stock"
+          type="number"
+          min="0"
+          value={form.stock}
+          onChange={handleChange}
+          required
         />
       </div>
 

@@ -112,6 +112,7 @@ function AdminProductos() {
                 <th>Nombre</th>
                 <th>Categoria</th>
                 <th>Precio</th>
+                <th>Stock</th>
                 <th>Descripcion</th>
                 <th>Acciones</th>
               </tr>
@@ -122,6 +123,7 @@ function AdminProductos() {
                   <td>{p.nombre}</td>
                   <td>{p.categoria}</td>
                   <td>${p.precio}</td>
+                  <td>{p.stock !== undefined ? p.stock : 0}</td>
                   <td>{p.descripcion || '-'}</td>
                   <td>
                     <div className="table-actions">

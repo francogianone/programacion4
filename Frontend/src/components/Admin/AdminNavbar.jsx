@@ -20,6 +20,12 @@ function AdminNavbar() {
         >
           Ordenes
         </Link>
+        <Link
+          to="/admin/usuarios"
+          className={`admin-nav-link${pathname.startsWith('/admin/usuarios') ? ' admin-nav-link--active' : ''}`}
+        >
+          Usuarios
+        </Link>
       </nav>
       <Link to="/productos" className="admin-navbar__back">
         Volver al sitio

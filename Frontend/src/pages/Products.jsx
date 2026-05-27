@@ -99,6 +99,7 @@ function Products() {
               precio={product.precio}
               categoria={product.categoria}
               descripcion={product.descripcion}
+              stock={product.stock}
             />
           ))
         )}
