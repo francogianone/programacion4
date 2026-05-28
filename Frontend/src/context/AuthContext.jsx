@@ -113,11 +113,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Solicitar recuperación de contraseña (Formspree a través del backend)
+  // Solicitar recuperación de contraseña
   const recuperarContrasena = async (email) => {
     try {
       const response = await axios.post(`${API_URL}/api/usuarios/recuperar-contrasena`, { email });
-      return { success: true, message: response.data.mensaje, devLink: response.data.devLink };
+      return { success: true, message: response.data.mensaje };
     } catch (error) {
       const errorMsg = error.response?.data?.error || 'Error al solicitar la recuperación';
       return { success: false, error: errorMsg };

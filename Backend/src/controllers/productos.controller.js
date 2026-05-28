@@ -50,9 +50,12 @@ const actualizarProducto = async (req, res) => {
   try {
     const { nombre, precio, categoria, descripcion, stock } = req.body;
 
+    const updateData = { nombre, precio, categoria, descripcion };
+    if (stock !== undefined) updateData.stock = Number(stock);
+
     const producto = await Producto.findOneAndUpdate(
       { _id: req.params.id, activo: true },
-      { nombre, precio, categoria, descripcion, stock: stock !== undefined ? Number(stock) : 0 },
+      updateData,
       { new: true, runValidators: true }
     );
 

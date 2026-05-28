@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import './Auth.css';
-import '../components/Admin/Admin.css';
+import { useAuth } from '../../context/AuthContext';
+import '../Auth.css';
+import '../../components/Admin/Admin.css';
 
 function ResetPassword() {
   const [nuevaContrasena, setNuevaContrasena] = useState('');
@@ -66,7 +66,7 @@ function ResetPassword() {
     <div className="auth-container">
       <div className="auth-card">
         <h2>Restablecer Contraseña</h2>
-        <p className="profile-sub" style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <p className="profile-sub profile-sub--centered">
           Introduce tu nueva contraseña a continuación.
         </p>
 
@@ -74,10 +74,10 @@ function ResetPassword() {
         {success && <div className="auth-success">{success}</div>}
 
         {!token ? (
-          <div className="auth-error" style={{ textAlign: 'center' }}>
+          <div className="auth-error auth-error--centered">
             El enlace de recuperación es inválido o le falta el token. Por favor solicita uno nuevo.
-            <div style={{ marginTop: '15px' }}>
-              <Link to="/recuperar-contrasena" className="btn-secondary" style={{ display: 'inline-block', textDecoration: 'none' }}>
+            <div className="mt-15">
+              <Link to="/recuperar-contrasena" className="btn-secondary">
                 Solicitar enlace
               </Link>
             </div>
@@ -106,7 +106,7 @@ function ResetPassword() {
                 required
               />
             </div>
-            <button type="submit" className="btn-primary" style={{ width: '100%', padding: '10px', marginTop: '10px' }} disabled={loading}>
+            <button type="submit" className="btn-primary btn-primary--full" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Contraseña'}
             </button>
           </form>

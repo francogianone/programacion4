@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import './Auth.css';
-import '../components/Admin/Admin.css';
+import { useAuth } from '../../context/AuthContext';
+import '../Auth.css';
+import '../../components/Admin/Admin.css';
+import './Profile.css';
 
 function Profile() {
   const { user, updateProfile, loading: authLoading } = useAuth();
@@ -23,13 +24,13 @@ function Profile() {
   }, [user]);
 
   if (authLoading) {
-    return <div style={{ textAlign: 'center', marginTop: '40px' }}>Cargando perfil...</div>;
+    return <div className="loading-center">Cargando perfil...</div>;
   }
 
   if (!user) {
     return (
       <div className="profile-container">
-        <div className="profile-card" style={{ textAlign: 'center' }}>
+        <div className="profile-card profile-card--centered">
           <h2>Acceso Denegado</h2>
           <p className="profile-sub">Debes iniciar sesión para ver tu perfil.</p>
         </div>
@@ -112,8 +113,8 @@ function Profile() {
             />
           </div>
 
-          <div style={{ marginTop: '20px', borderTop: '1px solid var(--border)', paddingTop: '15px' }}>
-            <h3 style={{ fontSize: '14px', marginBottom: '10px', color: 'var(--text-main)' }}>Cambiar Contraseña (Opcional)</h3>
+          <div className="profile-password-section">
+            <h3 className="profile-password-section__title">Cambiar Contraseña (Opcional)</h3>
             
             <div className="form-group">
               <label htmlFor="contrasena">Nueva Contraseña</label>
@@ -138,8 +139,8 @@ function Profile() {
             </div>
 
             {contrasena && contrasena.trim() !== '' && (
-              <div className="form-group" style={{ borderLeft: '3px solid var(--primary)', paddingLeft: '10px', marginTop: '10px' }}>
-                <label htmlFor="contrasenaVieja" style={{ fontWeight: 'bold' }}>Contraseña Actual</label>
+              <div className="form-group form-group--highlighted">
+                <label htmlFor="contrasenaVieja">Contraseña Actual</label>
                 <input
                   id="contrasenaVieja"
                   type="password"
@@ -152,7 +153,7 @@ function Profile() {
             )}
           </div>
 
-          <button type="submit" className="btn-primary" style={{ width: '100%', padding: '10px', marginTop: '15px' }} disabled={loading}>
+          <button type="submit" className="btn-primary btn-primary--full" disabled={loading}>
             {loading ? 'Guardando Cambios...' : 'Guardar Cambios'}
           </button>
         </form>

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import './Auth.css';
-import '../components/Admin/Admin.css';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import '../Auth.css';
+import '../../components/Admin/Admin.css';
 
 function Register() {
   const [nombre, setNombre] = useState('');
@@ -14,6 +14,8 @@ function Register() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ function Register() {
     setLoading(false);
 
     if (result.success) {
-      navigate('/productos');
+      navigate(redirectTo || '/productos');
     } else {
       setError(result.error);
     }
@@ -92,7 +94,7 @@ function Register() {
               required
             />
           </div>
-          <button type="submit" className="btn-primary" style={{ width: '100%', padding: '10px', marginTop: '10px' }} disabled={loading}>
+          <button type="submit" className="btn-primary btn-primary--full" disabled={loading}>
             {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>

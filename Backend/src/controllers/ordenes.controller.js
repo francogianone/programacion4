@@ -28,6 +28,12 @@ const crearOrden = async (req, res) => {
         return res.status(404).json({ error: `Producto ${productoId} no encontrado o inactivo` });
       }
 
+      if (producto.stock < Number(cantidad)) {
+        return res.status(400).json({
+          error: `Stock insuficiente para "${producto.nombre}". Disponible: ${producto.stock}`
+        });
+      }
+
       itemsResueltos.push({
         producto: producto._id,
         nombre: producto.nombre,
@@ -39,8 +45,18 @@ const crearOrden = async (req, res) => {
     }
 
     const total = subtotal + Number(costoEnvio);
-    const nuevaOrden = new Orden({ productos: itemsResueltos, costoEnvio: Number(costoEnvio), total });
+    const nuevaOrden = new Orden({
+      usuario: req.usuario._id,
+      productos: itemsResueltos,
+      costoEnvio: Number(costoEnvio),
+      total
+    });
     await nuevaOrden.save();
+
+    // Descontar stock de cada producto
+    for (const item of itemsResueltos) {
+      await Producto.findByIdAndUpdate(item.producto, { $inc: { stock: -item.cantidad } });
+    }
 
     res.status(201).json(nuevaOrden);
   } catch (error) {
@@ -48,9 +64,21 @@ const crearOrden = async (req, res) => {
   }
 };
 
+const obtenerMisOrdenes = async (req, res) => {
+  try {
+    const ordenes = await Orden.find({ usuario: req.usuario._id, activo: true })
+      .sort({ createdAt: -1 });
+    res.status(200).json(ordenes);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener tus compras' });
+  }
+};
+
 const obtenerOrdenes = async (req, res) => {
   try {
-    const ordenes = await Orden.find({ activo: true }).sort({ createdAt: -1 });
+    const ordenes = await Orden.find({ activo: true })
+      .populate('usuario', 'nombre email')
+      .sort({ createdAt: -1 });
     res.status(200).json(ordenes);
   } catch (error) {
     res.status(500).json({ error: 'Error al obtener ordenes' });
@@ -98,6 +126,7 @@ const actualizarEstadoOrden = async (req, res) => {
 
 module.exports = {
   crearOrden,
+  obtenerMisOrdenes,
   obtenerOrdenes,
   obtenerOrdenPorId,
   actualizarEstadoOrden

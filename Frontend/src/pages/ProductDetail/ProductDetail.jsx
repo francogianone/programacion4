@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useCart } from '../../context/CartContext.jsx';
+import './ProductDetail.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 function ProductDetail() {
   const { id } = useParams();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [agregado, setAgregado] = useState(false);
 
   useEffect(() => {
     axios.get(`${API_URL}/api/productos/${id}`)
@@ -28,19 +32,28 @@ function ProductDetail() {
 
   const sinStock = product.stock !== undefined && product.stock <= 0;
 
+  const handleAgregar = () => {
+    addToCart(product);
+    setAgregado(true);
+    setTimeout(() => setAgregado(false), 1500);
+  };
+
   return (
-    <div style={{ padding: '30px', maxWidth: '600px', margin: '40px auto', background: '#fff', borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-      <h2 style={{ marginBottom: '10px', color: 'var(--text-main)' }}>{product.nombre}</h2>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '12px', fontSize: '14px' }}>Categoría: {product.categoria}</p>
-      <p style={{ marginBottom: '20px', lineHeight: '1.6', color: 'var(--text-main)' }}>{product.descripcion || 'Sin descripción disponible.'}</p>
-      <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--primary)', marginBottom: '12px' }}>Precio: ${product.precio}</p>
-      <p style={{ 
-        fontSize: '14px', 
-        color: sinStock ? '#c0392b' : 'var(--btn-green)', 
-        fontWeight: 'bold'
-      }}>
+    <div className="product-detail">
+      <h2>{product.nombre}</h2>
+      <p className="product-detail__category">Categoría: {product.categoria}</p>
+      <p className="product-detail__description">{product.descripcion || 'Sin descripción disponible.'}</p>
+      <p className="product-detail__price">Precio: ${product.precio}</p>
+      <p className={`product-detail__stock ${sinStock ? 'product-detail__stock--out' : 'product-detail__stock--ok'}`}>
         {sinStock ? '🔴 Sin stock disponible' : `🟢 Stock disponible: ${product.stock}`}
       </p>
+      <button
+        className="product-detail__btn"
+        onClick={handleAgregar}
+        disabled={sinStock}
+      >
+        {agregado ? 'Agregado al carrito' : 'Agregar al carrito'}
+      </button>
     </div>
   );
 }

@@ -1,19 +1,22 @@
 import './App.css';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navigation/Navbar';
 import Footer from './components/Footer/Footer';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail';
-import Cart from './pages/Cart';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
+import Home from './pages/Home/Home';
+import Contact from './pages/Contact/Contact';
+import Products from './pages/Products/Products';
+import ProductDetail from './pages/ProductDetail/ProductDetail';
+import Cart from './pages/Cart/Cart';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import Profile from './pages/Profile/Profile';
 import AdminPanel from './pages/admin/AdminPanel';
 import AdminProductos from './pages/admin/AdminProductos';
 import AdminOrdenes from './pages/admin/AdminOrdenes';
 import AdminUsers from './pages/admin/AdminUsers';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
+import MisCompras from './pages/MisCompras/MisCompras';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
@@ -23,11 +26,10 @@ function AppContent() {
       <Navbar titulo="Mi App" />
 
       <Routes>
-        {/* Redirigir inicio a productos */}
-        <Route path="/" element={<Navigate to="/productos" replace />} />
-        
         {/* Rutas Públicas */}
+        <Route path="/" element={<Home />} />
         <Route path="/productos" element={<Products />} />
+        <Route path="/contacto" element={<Contact />} />
         <Route path="/productos/:id" element={<ProductDetail />} />
         <Route path="/carrito" element={<Cart />} />
         <Route path="/login" element={<Login />} />
@@ -41,6 +43,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mis-compras" 
+          element={
+            <ProtectedRoute>
+              <MisCompras />
             </ProtectedRoute>
           } 
         />

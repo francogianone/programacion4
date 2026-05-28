@@ -8,6 +8,8 @@ const {
   actualizarPerfil,
   obtenerUsuarios,
   actualizarUsuario,
+  darDeBajaUsuario,
+  restaurarUsuario,
   recuperarContrasena,
   restablecerContrasena
 } = require('../controllers/usuarios.controller');
@@ -28,5 +30,7 @@ router.put('/perfil', autenticar, actualizarPerfil);
 // Rutas de Administrador
 router.get('/', autenticar, autorizar('admin'), obtenerUsuarios);
 router.put('/:id', autenticar, autorizar('admin'), actualizarUsuario);
+router.patch('/:id/baja', autenticar, autorizar('admin'), darDeBajaUsuario);
+router.patch('/:id/restaurar', autenticar, autorizar('admin'), restaurarUsuario);
 
 module.exports = router;

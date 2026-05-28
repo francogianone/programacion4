@@ -11,7 +11,9 @@ function AdminUsers() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
+  const [accionando, setAccionando] = useState(null);
+
   // Estados para edición
   const [usuarioEdit, setUsuarioEdit] = useState(null);
   const [nombre, setNombre] = useState('');
@@ -41,15 +43,15 @@ function AdminUsers() {
   }, [user]);
 
   if (authLoading) {
-    return <div style={{ textAlign: 'center', marginTop: '40px' }}>Verificando autenticación...</div>;
+    return <div className="loading-center">Verificando autenticación...</div>;
   }
 
   if (!user || user.rol !== 'admin') {
     return (
-      <div className="admin-layout" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <div style={{ textAlign: 'center', background: '#fff', padding: '30px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+      <div className="admin-layout admin-layout--center">
+        <div className="access-denied">
           <h2>Acceso Denegado</h2>
-          <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>Debes ser administrador para ver esta sección.</p>
+          <p>Debes ser administrador para ver esta sección.</p>
         </div>
       </div>
     );
@@ -68,6 +70,31 @@ function AdminUsers() {
   const handleCancelEdit = () => {
     setUsuarioEdit(null);
     setSaveSuccess('');
+  };
+
+  const handleBaja = async (u) => {
+    if (!window.confirm(`¿Dar de baja a ${u.nombre}?`)) return;
+    setAccionando(u._id);
+    try {
+      await axios.patch(`${API_URL}/api/usuarios/${u._id}/baja`);
+      fetchUsuarios();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al dar de baja al usuario');
+    } finally {
+      setAccionando(null);
+    }
+  };
+
+  const handleRestaurar = async (u) => {
+    setAccionando(u._id);
+    try {
+      await axios.patch(`${API_URL}/api/usuarios/${u._id}/restaurar`);
+      fetchUsuarios();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al restaurar el usuario');
+    } finally {
+      setAccionando(null);
+    }
   };
 
   const handleSave = async (e) => {
@@ -108,10 +135,18 @@ function AdminUsers() {
       <div className="admin-section">
         <div className="admin-section__header">
           <h2>Gestión de Usuarios</h2>
-          <button className="btn-secondary" onClick={fetchUsuarios}>Refrescar</button>
+          <div className="admin-header-actions">
+            <button
+              className="btn-secondary"
+              onClick={() => setMostrarInactivos(v => !v)}
+            >
+              {mostrarInactivos ? 'Ver activos' : 'Ver inactivos'}
+            </button>
+            <button className="btn-secondary" onClick={fetchUsuarios}>Refrescar</button>
+          </div>
         </div>
 
-        {error && <div className="auth-error" style={{ marginBottom: '20px' }}>{error}</div>}
+        {error && <div className="auth-error auth-error--spaced">{error}</div>}
 
         {usuarioEdit ? (
           <div className="admin-form">
@@ -144,32 +179,30 @@ function AdminUsers() {
                 <select
                   value={rol}
                   onChange={(e) => setRol(e.target.value)}
-                  className="orden-estado-select"
-                  style={{ width: '100%' }}
+                  className="orden-estado-select select--full"
                   disabled={usuarioEdit._id === user._id}
                 >
                   <option value="cliente">Cliente</option>
                   <option value="admin">Administrador</option>
                 </select>
                 {usuarioEdit._id === user._id && (
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  <span className="form-hint">
                     No puedes cambiar tu propio rol de administrador.
                   </span>
                 )}
               </div>
 
-              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '8px', margin: '14px 0' }}>
+              <div className="form-group form-group--inline">
                 <input
                   id="user-active-checkbox"
                   type="checkbox"
                   checked={activo}
                   onChange={(e) => setActivo(e.target.checked)}
-                  style={{ width: 'auto', cursor: 'pointer' }}
                   disabled={usuarioEdit._id === user._id}
                 />
-                <label htmlFor="user-active-checkbox" style={{ cursor: 'pointer' }}>Usuario Activo</label>
+                <label htmlFor="user-active-checkbox">Usuario Activo</label>
                 {usuarioEdit._id === user._id && (
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  <span className="form-hint">
                     (No puedes desactivar tu propia cuenta)
                   </span>
                 )}
@@ -197,7 +230,7 @@ function AdminUsers() {
           </div>
         ) : (
           loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>Cargando listado de usuarios...</div>
+            <div className="table-loading">Cargando listado de usuarios...</div>
           ) : (
             <table className="admin-table">
               <thead>
@@ -215,19 +248,14 @@ function AdminUsers() {
                     <td colSpan="5" className="empty-state">No hay usuarios registrados.</td>
                   </tr>
                 ) : (
-                  usuarios.map((u) => (
+                  usuarios
+                    .filter(u => mostrarInactivos ? !u.activo : u.activo)
+                    .map((u) => (
                     <tr key={u._id}>
                       <td>{u.nombre}</td>
                       <td>{u.email}</td>
                       <td>
-                        <span style={{ 
-                          fontSize: '11px', 
-                          fontWeight: 'bold', 
-                          padding: '2px 8px', 
-                          borderRadius: '10px', 
-                          backgroundColor: u.rol === 'admin' ? '#cce5ff' : '#e2e3e5',
-                          color: u.rol === 'admin' ? '#004085' : '#383d41'
-                        }}>
+                        <span className={`role-badge ${u.rol === 'admin' ? 'role-badge--admin' : 'role-badge--client'}`}>
                           {u.rol === 'admin' ? 'Admin' : 'Cliente'}
                         </span>
                       </td>
@@ -236,10 +264,28 @@ function AdminUsers() {
                           {u.activo ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td>
+                      <td className="table-actions">
                         <button className="btn-edit" onClick={() => handleEditClick(u)}>
                           Editar
                         </button>
+                        {u.activo && u._id !== user._id && (
+                          <button
+                            className="btn-delete"
+                            onClick={() => handleBaja(u)}
+                            disabled={accionando === u._id}
+                          >
+                            {accionando === u._id ? '...' : 'Dar de baja'}
+                          </button>
+                        )}
+                        {!u.activo && (
+                          <button
+                            className="btn-restore"
+                            onClick={() => handleRestaurar(u)}
+                            disabled={accionando === u._id}
+                          >
+                            {accionando === u._id ? '...' : 'Restaurar'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))

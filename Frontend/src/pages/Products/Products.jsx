@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import ProductCard from '../components/Cards/ProductCard';
-import CategoryFilter from '../components/Filters/CategoryFilter';
-import SearchBar from '../components/Filters/SearchBar';
-import PriceFilter from '../components/Filters/PriceFilter';
+import ProductCard from '../../components/Cards/ProductCard';
+import CategoryFilter from '../../components/Filters/CategoryFilter';
+import SearchBar from '../../components/Filters/SearchBar';
+import PriceFilter from '../../components/Filters/PriceFilter';
 import './Products.css';
-import '../components/Filters/Filters.css';
+import '../../components/Filters/Filters.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,7 +23,8 @@ function Products() {
   useEffect(() => {
     axios.get(`${API_URL}/api/productos`)
       .then(res => {
-        setProducts(res.data);
+        const data = res.data;
+        setProducts(Array.isArray(data) ? data : data.productos ?? data.data ?? []);
         setLoading(false);
       })
       .catch(() => {

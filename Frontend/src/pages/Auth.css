@@ -85,3 +85,32 @@
   color: var(--text-muted);
   margin-bottom: 24px;
 }
+
+/* Utilidades compartidas entre páginas de autenticación */
+.btn-primary--full {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.profile-sub--centered {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.loading-center {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.auth-error--centered {
+  text-align: center;
+}
+
+.auth-error--spaced {
+  margin-bottom: 20px;
+}
+
+.mt-15 {
+  margin-top: 15px;
+}

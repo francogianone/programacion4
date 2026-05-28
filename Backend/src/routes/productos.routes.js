@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { autenticar, autorizar } = require('../middlewares/auth.middleware');
 
 const {
   obtenerProductos,
@@ -12,11 +13,11 @@ const {
 } = require('../controllers/productos.controller');
 
 router.get('/', obtenerProductos);
-router.get('/inactivos', obtenerProductosInactivos);
+router.get('/inactivos', autenticar, autorizar('admin'), obtenerProductosInactivos);
 router.get('/:id', obtenerProductoPorId);
-router.post('/', crearProducto);
-router.put('/:id', actualizarProducto);
-router.delete('/:id', eliminarProducto);
-router.patch('/:id/restaurar', restaurarProducto);
+router.post('/', autenticar, autorizar('admin'), crearProducto);
+router.put('/:id', autenticar, autorizar('admin'), actualizarProducto);
+router.delete('/:id', autenticar, autorizar('admin'), eliminarProducto);
+router.patch('/:id/restaurar', autenticar, autorizar('admin'), restaurarProducto);
 
 module.exports = router;

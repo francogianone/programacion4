@@ -105,8 +105,8 @@ function AdminOrdenes() {
                             <span>${orden.total}</span>
                           </li>
                         </ul>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                        <div className="estado-actions">
+                          <span className="estado-label">
                             Cambiar estado:
                           </span>
                           <select

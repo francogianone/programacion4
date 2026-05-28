@@ -1,6 +1,15 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const Usuario = require('../models/Usuario');
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  }
+});
 
 // Generar Token JWT
 const generarToken = (usuario) => {
@@ -210,7 +219,7 @@ const actualizarUsuario = async (req, res) => {
   }
 };
 
-// Solicitud de recuperación de contraseña (usando Formspree)
+// Solicitud de recuperación de contraseña
 const recuperarContrasena = async (req, res) => {
   try {
     const { email } = req.body;
@@ -237,31 +246,29 @@ const recuperarContrasena = async (req, res) => {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const enlaceRestablecer = `${frontendUrl}/restablecer-contrasena?token=${token}`;
 
-    // Enviar correo a través de Formspree
-    // Formspree connection string: https://formspree.io/f/mkoepewg
+    // Enviar correo de recuperación a través de Gmail
     try {
-      await fetch('https://formspree.io/f/mkoepewg', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          email: usuario.email,
-          _subject: 'Recuperar contraseña - Mi App',
-          mensaje: `Has solicitado restablecer tu contraseña para tu cuenta de Mi App. Haz clic en el siguiente enlace para hacerlo: ${enlaceRestablecer}`,
-          enlace: enlaceRestablecer
-        })
+      await transporter.sendMail({
+        from: `"Soporte" <${process.env.GMAIL_USER}>`,
+        to: usuario.email,
+        subject: 'Recuperar contraseña',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">Recuperar contraseña</h2>
+            <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta.</p>
+            <p>Hacé clic en el botón para continuar. El enlace es válido por 1 hora.</p>
+            <a href="${enlaceRestablecer}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#2563eb;color:#fff;border-radius:6px;text-decoration:none;font-weight:bold;">Restablecer contraseña</a>
+            <p style="color:#666;font-size:12px;">Si no solicitaste este cambio, ignorá este mensaje.</p>
+          </div>
+        `
       });
-      console.log(`✓ Solicitud de recuperación enviada a Formspree para: ${usuario.email}`);
-      console.log(`[DEV] Enlace de recuperación: ${enlaceRestablecer}`);
-    } catch (formspreeError) {
-      console.error('Error al enviar formulario a Formspree:', formspreeError.message);
+      console.log(`✓ Email de recuperación enviado a: ${usuario.email}`);
+    } catch (mailError) {
+      console.error('Error al enviar email:', mailError.message);
     }
 
     res.status(200).json({ 
-      mensaje: 'Si el correo está registrado, recibirás un enlace de recuperación.',
-      devLink: enlaceRestablecer
+      mensaje: 'Si el correo está registrado, recibirás un enlace de recuperación.'
     });
   } catch (error) {
     console.error('Error en recuperarContrasena:', error);
@@ -308,6 +315,50 @@ const restablecerContrasena = async (req, res) => {
   }
 };
 
+const darDeBajaUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id === req.usuario._id.toString()) {
+      return res.status(400).json({ error: 'No puedes dar de baja tu propia cuenta' });
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate(
+      id,
+      { activo: false },
+      { new: true }
+    ).select('-contrasena');
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ mensaje: 'Usuario dado de baja correctamente', usuario });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al dar de baja al usuario' });
+  }
+};
+
+const restaurarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await Usuario.findByIdAndUpdate(
+      id,
+      { activo: true },
+      { new: true }
+    ).select('-contrasena');
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ mensaje: 'Usuario restaurado correctamente', usuario });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al restaurar el usuario' });
+  }
+};
+
 module.exports = {
   registrarUsuario,
   iniciarSesion,
@@ -315,6 +366,8 @@ module.exports = {
   actualizarPerfil,
   obtenerUsuarios,
   actualizarUsuario,
+  darDeBajaUsuario,
+  restaurarUsuario,
   recuperarContrasena,
   restablecerContrasena
 };

@@ -21,6 +21,10 @@ const itemOrdenSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ordenSchema = new mongoose.Schema({
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario'
+  },
   productos: {
     type: [itemOrdenSchema],
     required: true
