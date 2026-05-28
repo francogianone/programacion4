@@ -110,7 +110,8 @@
 
 .table-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .btn-primary {
@@ -195,6 +196,48 @@
 .btn-edit:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+.btn-delete {
+  background: none;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-restore {
+  background: none;
+  border: 1px solid #27ae60;
+  color: #27ae60;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-restore:hover:not(:disabled) {
+  background: #27ae60;
+  color: #fff;
+}
+
+.btn-restore:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .toggle-inactivos {
@@ -354,6 +397,99 @@
 .admin-card h3 {
   font-size: 16px;
   margin-bottom: 6px;
+}
+
+/* Utilidades para páginas admin */
+.admin-layout--center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.access-denied {
+  text-align: center;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.access-denied p {
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.form-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.form-group--inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.form-group--inline input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+}
+
+.form-group--inline label {
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.select--full {
+  width: 100%;
+}
+
+.estado-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.estado-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.role-badge {
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.role-badge--admin {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.role-badge--client {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.table-loading {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.loading-center {
+  text-align: center;
+  margin-top: 40px;
 }
 
 .admin-card p {

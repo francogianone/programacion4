@@ -19,6 +19,10 @@ function AdminPanel() {
             <h3>Ordenes de Compra</h3>
             <p>Ver y gestionar el estado de las ordenes recibidas</p>
           </Link>
+          <Link to="/admin/usuarios" className="admin-card">
+            <h3>Usuarios</h3>
+            <p>Ver listado de usuarios, editar sus perfiles y cambiar sus roles</p>
+          </Link>
         </div>
       </div>
     </div>

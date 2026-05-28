@@ -25,6 +25,12 @@ const usuarioSchema = new mongoose.Schema({
   activo: {
     type: Boolean,
     default: true
+  },
+  restablecerContrasenaToken: {
+    type: String
+  },
+  restablecerContrasenaExpiracion: {
+    type: Date
   }
 }, { timestamps: true });
 

@@ -1,9 +1,9 @@
-import { useCart } from '../context/CartContext.jsx';
+import { useCart } from '../../context/CartContext.jsx';
 import { Link } from 'react-router-dom';
-import CartItem from '../components/Cart/CartItem';
-import CartSummary from '../components/Cart/CartSummary';
-import OrderSummary from '../components/Cart/OrderSummary';
-import '../components/Cart/Cart.css';
+import CartItem from '../../components/Cart/CartItem';
+import CartSummary from '../../components/Cart/CartSummary';
+import OrderSummary from '../../components/Cart/OrderSummary';
+import '../../components/Cart/Cart.css';
 
 function Cart() {
   const { cartItems, clearCart } = useCart();

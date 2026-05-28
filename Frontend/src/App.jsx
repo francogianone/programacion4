@@ -1,40 +1,106 @@
-import './App.css'
-import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navigation/Navbar'
-import Footer from './components/Footer/Footer'
-import Products from './pages/Products'
-import ProductDetail from './pages/ProductDetail'
-import Cart from './pages/Cart'
-import AdminPanel from './pages/admin/AdminPanel'
-import AdminProductos from './pages/admin/AdminProductos'
-import AdminOrdenes from './pages/admin/AdminOrdenes'
+import './App.css';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navigation/Navbar';
+import Footer from './components/Footer/Footer';
+import Home from './pages/Home/Home';
+import Contact from './pages/Contact/Contact';
+import Products from './pages/Products/Products';
+import ProductDetail from './pages/ProductDetail/ProductDetail';
+import Cart from './pages/Cart/Cart';
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import Profile from './pages/Profile/Profile';
+import AdminPanel from './pages/admin/AdminPanel';
+import AdminProductos from './pages/admin/AdminProductos';
+import AdminOrdenes from './pages/admin/AdminOrdenes';
+import AdminUsers from './pages/admin/AdminUsers';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
+import MisCompras from './pages/MisCompras/MisCompras';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
-function App() {
+function AppContent() {
   return (
     <>
-      <Navbar
-        titulo="Mi App"
-        links={[
-          { nombre: 'Inicio', ruta: '/' },
-          { nombre: 'Productos', ruta: '/productos' },
-          { nombre: 'Contacto', ruta: '/contacto' },
-          { nombre: 'Admin', ruta: '/admin' }
-        ]}
-      />
+      <Navbar titulo="Mi App" />
 
       <Routes>
+        {/* Rutas Públicas */}
+        <Route path="/" element={<Home />} />
         <Route path="/productos" element={<Products />} />
+        <Route path="/contacto" element={<Contact />} />
         <Route path="/productos/:id" element={<ProductDetail />} />
         <Route path="/carrito" element={<Cart />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/admin/productos" element={<AdminProductos />} />
-        <Route path="/admin/ordenes" element={<AdminOrdenes />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/recuperar-contrasena" element={<ForgotPassword />} />
+        <Route path="/restablecer-contrasena" element={<ResetPassword />} />
+
+        {/* Rutas Privadas de Usuario Cliente */}
+        <Route 
+          path="/perfil" 
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/mis-compras" 
+          element={
+            <ProtectedRoute>
+              <MisCompras />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Rutas Privadas de Administrador */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/productos" 
+          element={
+            <AdminRoute>
+              <AdminProductos />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/ordenes" 
+          element={
+            <AdminRoute>
+              <AdminOrdenes />
+            </AdminRoute>
+          } 
+        />
+        <Route 
+          path="/admin/usuarios" 
+          element={
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
+          } 
+        />
       </Routes>
 
       <Footer />
     </>
-  )
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
+export default App;
