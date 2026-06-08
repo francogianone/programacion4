@@ -12,7 +12,7 @@ const autenticar = async (req, res, next) => {
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = jwt.verify(token, process.env.JWT_SECRET || 'supersecrettokenkey123');
     } catch (err) {
       return res.status(401).json({ error: 'Token inválido o expirado' });
     }

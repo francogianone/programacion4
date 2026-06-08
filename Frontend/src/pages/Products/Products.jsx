@@ -7,7 +7,7 @@ import PriceFilter from '../../components/Filters/PriceFilter';
 import './Products.css';
 import '../../components/Filters/Filters.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -100,6 +100,7 @@ function Products() {
               precio={product.precio}
               categoria={product.categoria}
               descripcion={product.descripcion}
+              imagen={product.imagen}
               stock={product.stock}
             />
           ))

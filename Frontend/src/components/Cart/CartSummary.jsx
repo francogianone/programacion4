@@ -7,7 +7,7 @@ import './Cart.css';
 
 // TODO: reemplazar con cotizacion de API de correo
 const COSTO_ENVIO = 2000;
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function CartSummary() {
   const { cartItems, cartTotal, clearCart } = useCart();

@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
 import ProductForm from '../../components/Admin/ProductForm';
+import { useAuth } from '../../context/AuthContext';
 import '../../components/Admin/Admin.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function AdminProductos() {
+
+  const { token, loading } = useAuth();
   const [productos, setProductos] = useState([]);
   const [productosInactivos, setProductosInactivos] = useState([]);
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
@@ -14,41 +17,81 @@ function AdminProductos() {
   const [mostrarForm, setMostrarForm] = useState(false);
 
   const cargarProductos = () => {
-    axios.get(`${API_URL}/api/productos`)
-      .then(res => setProductos(res.data))
-      .catch(() => alert('Error al cargar productos'));
+    if (!token) return;
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
+    axios.get(`${API_URL}/api/productos?_t=${Date.now()}`, config)
+      .then(res => {
+        const data = res.data;
+        setProductos(Array.isArray(data) ? data : data.productos ?? data.data ?? []);
+      })
+      .catch((err) => {
+        console.error("Error productos activos:", err.response || err);
+        alert('Error al cargar productos');
+      });
   };
 
   const cargarInactivos = () => {
-    axios.get(`${API_URL}/api/productos/inactivos`)
-      .then(res => setProductosInactivos(res.data))
-      .catch(() => alert('Error al cargar productos inactivos'));
+    if (!token) return;
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
+    axios.get(`${API_URL}/api/productos/inactivos?_t=${Date.now()}`, config)
+      .then(res => {
+        const data = res.data;
+        setProductosInactivos(Array.isArray(data) ? data : data.productos ?? data.data ?? []);
+      })
+      .catch((err) => {
+        console.error("Error productos inactivos:", err.response || err);
+        alert('Error al cargar productos inactivos');
+      });
   };
 
+  // 3. Asegurá que el useEffect vigile de cerca cuándo aparece el token
   useEffect(() => {
-    cargarProductos();
-    cargarInactivos();
-  }, []);
+    if (!loading && token) {
+      cargarProductos();
+      cargarInactivos();
+    }
+
+  }, [loading, token]);
 
   const handleBaja = (id) => {
     if (!confirm('Dar de baja este producto?')) return;
-    axios.delete(`${API_URL}/api/productos/${id}`)
+    const config = { headers: { 'Authorization': `Bearer ${token}` } };
+    axios.delete(`${API_URL}/api/productos/${id}`, config) // <-- Pasamos el config
       .then(() => {
         alert('Producto dado de baja');
         cargarProductos();
         cargarInactivos();
       })
-      .catch(() => alert('Error al dar de baja el producto'));
+      .catch((err) => {
+        const msj = err.response?.data?.error || err.message || 'Error desconocido';
+        alert(`Error al dar de baja el producto: ${msj}`);
+      });
   };
 
   const handleRestaurar = (id) => {
-    axios.patch(`${API_URL}/api/productos/${id}/restaurar`)
+    const config = { headers: { 'Authorization': `Bearer ${token}` } };
+    axios.patch(`${API_URL}/api/productos/${id}/restaurar`, {}, config) // <-- Pasamos el config (el segundo parámetro es el body, enviamos vacío)
       .then(() => {
         alert('Producto restaurado');
         cargarProductos();
         cargarInactivos();
       })
-      .catch(() => alert('Error al restaurar el producto'));
+      .catch((err) => {
+        const msj = err.response?.data?.error || err.message || 'Error desconocido';
+        alert(`Error al restaurar el producto: ${msj}`);
+      });
   };
 
   const handleEditar = (producto) => {
@@ -66,7 +109,13 @@ function AdminProductos() {
     setMostrarForm(false);
     setProductoEditando(null);
     cargarProductos();
+    cargarInactivos(); // Es clave recargar ambos estados para mantener la consistencia
   };
+
+  if (loading) {
+    return <div className="admin-layout"><p>Cargando panel de administración...</p></div>;
+  }
+
 
   const lista = mostrarInactivos ? productosInactivos : productos;
 
@@ -109,6 +158,7 @@ function AdminProductos() {
           <table className="admin-table">
             <thead>
               <tr>
+                <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Categoria</th>
                 <th>Precio</th>
@@ -120,6 +170,7 @@ function AdminProductos() {
             <tbody>
               {lista.map((p) => (
                 <tr key={p._id}>
+                  <td><img src={p.imagen} alt={p.nombre} /></td>
                   <td>{p.nombre}</td>
                   <td>{p.categoria}</td>
                   <td>${p.precio}</td>

@@ -1,21 +1,26 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 import './Admin.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const camposVacios = { nombre: '', precio: '', categoria: '', descripcion: '', stock: '' };
+const camposVacios = { nombre: '', precio: '', categoria: '', descripcion: '', stock: '', imagen: '' };
 
 function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
+  // EXTRAE EL TOKEN DESDE EL CONTEXTO
+  const { token } = useAuth();
+
   const [form, setForm] = useState(
     productoInicial
       ? {
-          nombre: productoInicial.nombre,
-          precio: productoInicial.precio,
-          categoria: productoInicial.categoria,
-          descripcion: productoInicial.descripcion || '',
-          stock: productoInicial.stock !== undefined ? productoInicial.stock : 0
-        }
+        nombre: productoInicial.nombre,
+        precio: productoInicial.precio,
+        categoria: productoInicial.categoria,
+        descripcion: productoInicial.descripcion || '',
+        stock: productoInicial.stock !== undefined ? productoInicial.stock : 0,
+        imagen: productoInicial.imagen || ''
+      }
       : camposVacios
   );
   const [enviando, setEnviando] = useState(false);
@@ -26,7 +31,16 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Token actual del contexto:", token);
     setEnviando(true);
+
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    };
 
     try {
       if (modo === 'crear') {
@@ -34,7 +48,8 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           ...form,
           precio: Number(form.precio),
           stock: Number(form.stock || 0)
-        });
+        }, config);
+
         alert('Producto creado correctamente');
         setForm(camposVacios);
       } else {
@@ -42,7 +57,8 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           ...form,
           precio: Number(form.precio),
           stock: Number(form.stock || 0)
-        });
+        }, config);
+
         alert('Producto actualizado correctamente');
       }
       if (onSuccess) onSuccess();
@@ -53,6 +69,7 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
       setEnviando(false);
     }
   };
+
 
   return (
     <form className="admin-form" onSubmit={handleSubmit}>
@@ -105,6 +122,18 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           rows={3}
           value={form.descripcion}
           onChange={handleChange}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="imagen">URL de imagen</label>
+        <input
+          id="imagen"
+          name="imagen"
+          type="text"
+          value={form.imagen}
+          onChange={handleChange}
+          placeholder="https://"
         />
       </div>
 

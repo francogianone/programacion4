@@ -2,12 +2,18 @@ import './Card.css'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext.jsx'
 
-function ProductCard({ id, nombre, precio, categoria, descripcion, stock }) {
+function ProductCard({ id, nombre, precio, categoria, descripcion, stock , imagen }) {
   const { addToCart } = useCart();
   const sinStock = stock !== undefined && stock <= 0;
 
   return (
     <div className="card">
+      <div style={{ width: '100%', height: '200px', overflow: 'hidden', borderRadius: '4px', backgroundColor: '#f5f5f5' }}>
+        <img 
+          src={imagen} alt={nombre} className="card-image"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+        />
+      </div>
       <h3>{nombre}</h3>
       <p>{categoria}</p>
       <p>{descripcion}</p>
@@ -25,7 +31,7 @@ function ProductCard({ id, nombre, precio, categoria, descripcion, stock }) {
           Ver detalle
         </Link>
         <button
-          onClick={() => addToCart({ id, nombre, precio, categoria, descripcion, stock })}
+          onClick={() => addToCart({ id, nombre, precio, categoria, descripcion, stock, imagen })}
           disabled={sinStock}
           style={{
             backgroundColor: sinStock ? '#e0e0e0' : 'var(--primary)',

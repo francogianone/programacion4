@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useCart } from '../../context/CartContext.jsx';
 import './ProductDetail.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function ProductDetail() {
   const { id } = useParams();
@@ -41,6 +41,11 @@ function ProductDetail() {
   return (
     <div className="product-detail">
       <h2>{product.nombre}</h2>
+      {product.imagen && (
+        <div className="product-detail__image-container">
+          <img src={product.imagen} alt={product.nombre} className="product-detail__image" />
+        </div>
+      )}
       <p className="product-detail__category">Categoría: {product.categoria}</p>
       <p className="product-detail__description">{product.descripcion || 'Sin descripción disponible.'}</p>
       <p className="product-detail__price">Precio: ${product.precio}</p>

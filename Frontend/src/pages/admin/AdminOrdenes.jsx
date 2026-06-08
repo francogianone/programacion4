@@ -3,7 +3,7 @@ import axios from 'axios';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
 import '../../components/Admin/Admin.css';
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const ESTADOS = ['pendiente', 'confirmada', 'enviada', 'entregada', 'cancelada'];
 
