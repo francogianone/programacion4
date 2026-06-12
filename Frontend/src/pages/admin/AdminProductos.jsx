@@ -170,7 +170,7 @@ function AdminProductos() {
             <tbody>
               {lista.map((p) => (
                 <tr key={p._id}>
-                  <td><img src={p.imagen} alt={p.nombre} /></td>
+                  <td>{p.imagen ? <img src={p.imagen} alt={p.nombre} /> : <span>—</span>}</td>
                   <td>{p.nombre}</td>
                   <td>{p.categoria}</td>
                   <td>${p.precio}</td>

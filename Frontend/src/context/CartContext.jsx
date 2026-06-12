@@ -17,15 +17,16 @@ export const CartProvider = ({ children }) => {
 
   // 4. Función addToCart (agrega o incrementa cantidad, respeta stock)
   const addToCart = (product) => {
+    const productId = product.id || product._id;
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.id === product.id);
+      const existingItem = prevItems.find((item) => item.id === productId);
       if (existingItem) {
         if (existingItem.quantity >= product.stock) return prevItems;
         return prevItems.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...product, id: productId, quantity: 1 }];
     });
   };
 

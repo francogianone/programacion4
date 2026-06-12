@@ -126,3 +126,76 @@
   font-size: 1rem;
   color: var(--text-main, #1a1a1a);
 }
+
+/* ── Vacío ── */
+.mis-compras-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.mis-compras-vacio__btn {
+  text-decoration: none;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+}
+
+/* ── Footer de tarjeta ── */
+.compra-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.compra-card__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compra-meta-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.compra-meta-badge--pago {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.compra-meta-badge--entrega {
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.compra-card__totales {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+  font-size: 0.88rem;
+}
+
+/* ── Datos de envío ── */
+.compra-card__envio-detalle {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border, #e0e0e0);
+  display: flex;
+  gap: 6px;
+  font-size: 0.83rem;
+  flex-wrap: wrap;
+}
+
+.compra-envio-detalle__label {
+  color: var(--text-muted, #666);
+  font-weight: 600;
+}
+
+.compra-envio-detalle__valor {
+  color: var(--text-main, #333);
+}

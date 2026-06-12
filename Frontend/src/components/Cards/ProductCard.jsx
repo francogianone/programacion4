@@ -9,10 +9,16 @@ function ProductCard({ id, nombre, precio, categoria, descripcion, stock , image
   return (
     <div className="card">
       <div style={{ width: '100%', height: '200px', overflow: 'hidden', borderRadius: '4px', backgroundColor: '#f5f5f5' }}>
-        <img 
-          src={imagen} alt={nombre} className="card-image"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-        />
+        {imagen ? (
+          <img
+            src={imagen} alt={nombre} className="card-image"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+            Sin imagen
+          </div>
+        )}
       </div>
       <h3>{nombre}</h3>
       <p>{categoria}</p>
@@ -24,7 +30,7 @@ function ProductCard({ id, nombre, precio, categoria, descripcion, stock , image
         fontWeight: sinStock ? 'bold' : 'normal',
         marginTop: '4px'
       }}>
-        {sinStock ? '🔴 Sin stock' : `🟢 Stock: ${stock !== undefined ? stock : 0}`}
+        {sinStock ? 'Sin stock' : `En Stock: ${stock !== undefined ? stock : 0}`}
       </p>
       <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '12px' }}>
         <Link to={`/productos/${id}`} className="btn-secondary" style={{ padding: '6px 12px', fontSize: '12.5px', borderRadius: '4px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
