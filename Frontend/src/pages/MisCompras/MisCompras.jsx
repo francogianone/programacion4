@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './MisCompras.css';
 
@@ -67,7 +68,12 @@ function MisCompras() {
         )}
 
         {!loading && !error && compras.length === 0 && (
-          <p className="mis-compras-estado">Todavía no realizaste ninguna compra.</p>
+          <div className="mis-compras-vacio">
+            <p className="mis-compras-estado">Todavía no realizaste ninguna compra.</p>
+            <Link to="/productos" className="btn-primary mis-compras-vacio__btn">
+              Empezar a comprar
+            </Link>
+          </div>
         )}
 
         {!loading && !error && compras.length > 0 && (
@@ -101,9 +107,31 @@ function MisCompras() {
                 </div>
 
                 <div className="compra-card__footer">
-                  <span className="compra-envio">Envio: {formatPrecio(compra.costoEnvio)}</span>
-                  <span className="compra-total">Total: {formatPrecio(compra.total)}</span>
+                  <div className="compra-card__meta">
+                    <span className="compra-meta-badge compra-meta-badge--pago">
+                      {compra.metodoPago === 'transferencia' ? 'Transferencia' : 'Efectivo'}
+                    </span>
+                    <span className="compra-meta-badge compra-meta-badge--entrega">
+                      {compra.tipoEntrega === 'envio' ? 'Envío a domicilio' : 'Retiro en local'}
+                    </span>
+                  </div>
+                  <div className="compra-card__totales">
+                    <span className="compra-envio">Envío: {formatPrecio(compra.costoEnvio)}</span>
+                    <span className="compra-total">Total: {formatPrecio(compra.total)}</span>
+                  </div>
                 </div>
+
+                {compra.tipoEntrega === 'envio' && compra.datosEnvio && (
+                  <div className="compra-card__envio-detalle">
+                    <span className="compra-envio-detalle__label">Dirección de envío:</span>
+                    <span className="compra-envio-detalle__valor">
+                      {compra.datosEnvio.domicilio}
+                      {compra.datosEnvio.localidad && `, ${compra.datosEnvio.localidad}`}
+                      {compra.datosEnvio.provincia && `, ${compra.datosEnvio.provincia}`}
+                      {compra.datosEnvio.cp && ` (CP ${compra.datosEnvio.cp})`}
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>

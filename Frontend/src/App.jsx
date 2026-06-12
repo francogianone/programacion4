@@ -17,13 +17,14 @@ import AdminUsers from './pages/admin/AdminUsers';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import MisCompras from './pages/MisCompras/MisCompras';
+import Checkout from './pages/Checkout/Checkout';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
 function AppContent() {
   return (
     <>
-      <Navbar titulo="Mi App" />
+      <Navbar titulo="Libreria" />
 
       <Routes>
         {/* Rutas Públicas */}
@@ -51,6 +52,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <MisCompras />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/checkout" 
+          element={
+            <ProtectedRoute>
+              <Checkout />
             </ProtectedRoute>
           } 
         />

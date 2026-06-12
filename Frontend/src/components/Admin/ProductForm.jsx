@@ -31,7 +31,6 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Token actual del contexto:", token);
     setEnviando(true);
 
 

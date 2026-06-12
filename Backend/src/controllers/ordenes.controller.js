@@ -3,7 +3,7 @@ const Producto = require('../models/Producto');
 
 const crearOrden = async (req, res) => {
   try {
-    const { productos, costoEnvio } = req.body;
+    const { productos, costoEnvio, metodoPago, tipoEntrega, datosFacturacion, datosEnvio } = req.body;
 
     if (!productos || !Array.isArray(productos) || productos.length === 0) {
       return res.status(400).json({ error: 'Se requiere al menos un producto' });
@@ -11,6 +11,29 @@ const crearOrden = async (req, res) => {
 
     if (costoEnvio === undefined || costoEnvio < 0) {
       return res.status(400).json({ error: 'costoEnvio es obligatorio y debe ser mayor o igual a 0' });
+    }
+
+    if (!metodoPago || !['transferencia', 'efectivo'].includes(metodoPago)) {
+      return res.status(400).json({ error: 'metodoPago debe ser "transferencia" o "efectivo"' });
+    }
+
+    if (!tipoEntrega || !['envio', 'retiro'].includes(tipoEntrega)) {
+      return res.status(400).json({ error: 'tipoEntrega debe ser "envio" o "retiro"' });
+    }
+
+    if (
+      !datosFacturacion ||
+      !datosFacturacion.nombre?.trim() ||
+      !datosFacturacion.dni?.trim() ||
+      !datosFacturacion.domicilio?.trim()
+    ) {
+      return res.status(400).json({ error: 'datosFacturacion con nombre, dni y domicilio son obligatorios' });
+    }
+
+    if (tipoEntrega === 'envio') {
+      if (!datosEnvio || !datosEnvio.domicilio?.trim()) {
+        return res.status(400).json({ error: 'El domicilio de envío es obligatorio para envío a domicilio' });
+      }
     }
 
     const itemsResueltos = [];
@@ -49,7 +72,11 @@ const crearOrden = async (req, res) => {
       usuario: req.usuario._id,
       productos: itemsResueltos,
       costoEnvio: Number(costoEnvio),
-      total
+      total,
+      metodoPago,
+      tipoEntrega,
+      datosFacturacion,
+      ...(tipoEntrega === 'envio' && { datosEnvio })
     });
     await nuevaOrden.save();
 

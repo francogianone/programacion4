@@ -1,44 +1,23 @@
-import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { useCart } from '../../context/CartContext.jsx';
 import { useAuth } from '../../context/AuthContext';
 import './Cart.css';
 
-// TODO: reemplazar con cotizacion de API de correo
 const COSTO_ENVIO = 2000;
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function CartSummary() {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartTotal } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [procesando, setProcesando] = useState(false);
 
   const total = cartTotal + COSTO_ENVIO;
 
-  const handleFinalizarCompra = async () => {
+  const handleFinalizarCompra = () => {
     if (!user) {
       navigate('/login?redirect=/carrito');
       return;
     }
-    setProcesando(true);
-    try {
-      await axios.post(`${API_URL}/api/ordenes`, {
-        productos: cartItems.map(item => ({
-          productoId: item.id,
-          cantidad: item.quantity
-        })),
-        costoEnvio: COSTO_ENVIO
-      });
-      alert('Orden creada correctamente');
-      clearCart();
-    } catch (err) {
-      const mensaje = err.response?.data?.error || 'Error inesperado';
-      alert(`Error: ${mensaje}`);
-    } finally {
-      setProcesando(false);
-    }
+    navigate('/checkout');
   };
 
   return (
@@ -59,9 +38,8 @@ function CartSummary() {
       <button
         className="cart-summary__btn"
         onClick={handleFinalizarCompra}
-        disabled={procesando}
       >
-        {procesando ? 'Procesando...' : 'Finalizar compra'}
+        Finalizar compra
       </button>
       {!user && (
         <p className="cart-summary__auth-hint">

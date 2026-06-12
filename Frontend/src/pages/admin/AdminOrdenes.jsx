@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
 import '../../components/Admin/Admin.css';
@@ -64,8 +64,8 @@ function AdminOrdenes() {
             </thead>
             <tbody>
               {ordenes.map((orden) => (
-                <>
-                  <tr key={orden._id}>
+                <Fragment key={orden._id}>
+                  <tr>
                     <td>{formatFecha(orden.createdAt)}</td>
                     <td>{orden.productos.length} producto(s)</td>
                     <td>${orden.total}</td>
@@ -87,7 +87,7 @@ function AdminOrdenes() {
                   </tr>
 
                   {expandida === orden._id && (
-                    <tr key={`${orden._id}-detalle`} className="orden-detalle">
+                    <tr className="orden-detalle">
                       <td colSpan={5}>
                         <ul className="orden-items-list">
                           {orden.productos.map((item, i) => (
@@ -122,7 +122,7 @@ function AdminOrdenes() {
                       </td>
                     </tr>
                   )}
-                </>
+                </Fragment>
               ))}
             </tbody>
           </table>
