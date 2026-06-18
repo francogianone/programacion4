@@ -1,15 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 const Usuario = require('../models/Usuario');
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
-  }
-});
+const { sendMailSafe } = require('../config/mailer');
 
 // Generar Token JWT
 const generarToken = (usuario) => {
@@ -249,7 +241,7 @@ const recuperarContrasena = async (req, res) => {
     // Enviar correo de recuperación a través de Gmail
     let emailEnviado = false;
     try {
-      await transporter.sendMail({
+      await sendMailSafe({
         from: `"Soporte" <${process.env.GMAIL_USER}>`,
         to: usuario.email,
         subject: 'Recuperar contraseña',

@@ -5,8 +5,21 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS
-  }
+  },
+  connectionTimeout: 5000,
+  greetingTimeout: 5000,
+  socketTimeout: 5000
 });
+
+// Envuelve sendMail con un timeout de seguridad para evitar que quede
+// colgado cuando el host bloquea SMTP (ej: Render plan gratuito).
+const sendMailSafe = (opciones) =>
+  Promise.race([
+    transporter.sendMail(opciones),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Timeout al enviar email (SMTP bloqueado)')), 8000)
+    )
+  ]);
 
 const escapeHtml = (str) =>
   String(str)
