@@ -13,25 +13,37 @@ export function AuthProvider({ children }) {
 
   // Cargar token y usuario desde localStorage al iniciar
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
+    const initializeAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
 
-    if (storedToken && storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setToken(storedToken);
-        setUser(parsedUser);
+      if (storedToken && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setToken(storedToken);
+          setUser(parsedUser);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 
-        // Configurar cabecera de axios para todas las peticiones futuras
-        axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-      } catch (error) {
-        console.error('Error al restaurar la sesión desde localStorage:', error);
-        // Limpiar sesión corrupta
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+          // Fetch the latest profile to ensure roles and status are up to date
+          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          const res = await axios.get(`${API_URL}/api/usuarios/perfil`);
+          
+          setUser(res.data);
+          localStorage.setItem('user', JSON.stringify(res.data));
+        } catch (error) {
+          console.error('Error al verificar la sesión:', error);
+          // Si el token expiro o el usuario fue eliminado/desactivado, limpiar sesión
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setToken(null);
+          setUser(null);
+          delete axios.defaults.headers.common['Authorization'];
+        }
       }
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    initializeAuth();
   }, []);
 
   // Iniciar Sesión

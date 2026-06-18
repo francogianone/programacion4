@@ -1,8 +1,10 @@
 /* ─── Cart page layout ───────────────────────────────── */
 .cart-page {
-  padding: 20px 30px;
+  padding: 32px 24px 60px;
   max-width: 1100px;
   margin: 0 auto;
+  background-color: var(--paper);
+  min-height: calc(100vh - 62px);
 }
 
 .cart-page__header {
@@ -61,11 +63,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ffffff;
+  background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 16px 20px;
   gap: 16px;
+  transition: border-color var(--transition);
 }
 
 .cart-item__name {
@@ -96,23 +99,24 @@
 }
 
 .qty-btn {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
   background: none;
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-main);
-  transition: border-color 0.15s, color 0.15s;
+  color: var(--ink);
+  transition: border-color var(--transition), color var(--transition), background-color var(--transition);
 }
 
 .qty-btn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--ink);
+  color: var(--ink);
+  background-color: var(--surface-alt);
 }
 
 .qty-value {
@@ -122,27 +126,29 @@
 }
 
 .remove-btn {
-  background-color: #c0392b;
-  color: #ffffff;
-  border: none;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--ink-muted);
   padding: 6px 12px;
-  border-radius: 5px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-size: 12px;
   cursor: pointer;
   margin-left: 8px;
-  transition: background-color 0.15s;
+  transition: border-color var(--transition), color var(--transition), background-color var(--transition);
 }
 
 .remove-btn:hover {
-  background-color: #a93226;
+  border-color: var(--danger);
+  color: var(--danger);
+  background-color: var(--danger-light);
 }
 
 /* ─── OrderSummary ───────────────────────────────────── */
 .order-summary {
-  background-color: #ffffff;
+  background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 18px;
 }
 
 .order-summary__title {
@@ -190,10 +196,10 @@
 
 /* ─── CartSummary ────────────────────────────────────── */
 .cart-summary {
-  background-color: #ffffff;
+  background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 18px;
 }
 
 .cart-summary__title {
@@ -224,18 +230,20 @@
 .cart-summary__btn {
   width: 100%;
   margin-top: 14px;
-  background-color: var(--btn-green);
+  background-color: var(--ink);
   color: #ffffff;
   border: none;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 15px;
+  padding: 13px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--transition), transform var(--transition);
 }
 
 .cart-summary__btn:hover {
-  background-color: var(--btn-green-hover);
+  background-color: var(--brand);
+  transform: translateY(-1px);
 }
 
 .cart-summary__btn:disabled {
@@ -281,6 +289,58 @@
 
 .cart-empty a:hover {
   text-decoration: underline;
+}
+
+/* ─── Estilos de Producto Agotado ────────────────────── */
+.cart-item__image-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-alt);
+  margin-right: 15px;
+}
+
+.cart-item__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cart-item__image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: var(--border);
+}
+
+.cart-item--agotado {
+  opacity: 0.7;
+  background-color: #fcfcfc;
+}
+
+.cart-item--agotado .cart-item__image {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.cart-item__agotado-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(90, 90, 90, 0.9);
+  color: white;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ─── Responsive ─────────────────────────────────────── */

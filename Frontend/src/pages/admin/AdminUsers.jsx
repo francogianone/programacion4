@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
+import { confirmDialog, toastError } from '../../utils/alerts';
 import '../../components/Admin/Admin.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -73,25 +74,36 @@ function AdminUsers() {
   };
 
   const handleBaja = async (u) => {
-    if (!window.confirm(`¿Dar de baja a ${u.nombre}?`)) return;
+    const ok = await confirmDialog(
+      `¿Dar de baja a ${u.nombre}?`,
+      'El usuario quedará inactivo y no podrá ingresar al sistema.',
+      'Dar de baja'
+    );
+    if (!ok) return;
     setAccionando(u._id);
     try {
       await axios.patch(`${API_URL}/api/usuarios/${u._id}/baja`);
       fetchUsuarios();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al dar de baja al usuario');
+      toastError(err.response?.data?.error || 'Error al dar de baja al usuario');
     } finally {
       setAccionando(null);
     }
   };
 
   const handleRestaurar = async (u) => {
+    const ok = await confirmDialog(
+      `¿Restaurar a ${u.nombre}?`,
+      'El usuario podrá volver a ingresar al sistema.',
+      'Restaurar'
+    );
+    if (!ok) return;
     setAccionando(u._id);
     try {
       await axios.patch(`${API_URL}/api/usuarios/${u._id}/restaurar`);
       fetchUsuarios();
     } catch (err) {
-      setError(err.response?.data?.error || 'Error al restaurar el usuario');
+      toastError(err.response?.data?.error || 'Error al restaurar el usuario');
     } finally {
       setAccionando(null);
     }
@@ -154,68 +166,86 @@ function AdminUsers() {
             {saveSuccess && <div className="auth-success">{saveSuccess}</div>}
             
             <form onSubmit={handleSave}>
-              <div className="form-group">
-                <label>Nombre Completo</label>
-                <input
-                  type="text"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                  required
-                />
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Nombre Completo</label>
+                  <input
+                    type="text"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Rol</label>
+                  <select
+                    value={rol}
+                    onChange={(e) => setRol(e.target.value)}
+                    className="select--full"
+                    disabled={usuarioEdit._id === user._id}
+                  >
+                    <option value="cliente">Cliente</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                  {usuarioEdit._id === user._id && (
+                    <span className="form-hint">
+                      No puedes cambiar tu propio rol.
+                    </span>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label>Cambiar Contraseña</label>
+                  <input
+                    type="password"
+                    placeholder="Dejar en blanco para no cambiar"
+                    value={contrasena}
+                    onChange={(e) => setContrasena(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Rol</label>
-                <select
-                  value={rol}
-                  onChange={(e) => setRol(e.target.value)}
-                  className="orden-estado-select select--full"
-                  disabled={usuarioEdit._id === user._id}
-                >
-                  <option value="cliente">Cliente</option>
-                  <option value="admin">Administrador</option>
-                </select>
-                {usuarioEdit._id === user._id && (
-                  <span className="form-hint">
-                    No puedes cambiar tu propio rol de administrador.
-                  </span>
-                )}
-              </div>
-
-              <div className="form-group form-group--inline">
-                <input
-                  id="user-active-checkbox"
-                  type="checkbox"
-                  checked={activo}
-                  onChange={(e) => setActivo(e.target.checked)}
-                  disabled={usuarioEdit._id === user._id}
-                />
-                <label htmlFor="user-active-checkbox">Usuario Activo</label>
-                {usuarioEdit._id === user._id && (
-                  <span className="form-hint">
-                    (No puedes desactivar tu propia cuenta)
-                  </span>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label>Cambiar Contraseña (Opcional)</label>
-                <input
-                  type="password"
-                  placeholder="Nueva contraseña (dejar en blanco para no cambiar)"
-                  value={contrasena}
-                  onChange={(e) => setContrasena(e.target.value)}
-                />
+                <label>Estado</label>
+                <div>
+                  <button
+                    type="button"
+                    className={activo ? 'btn-restore' : 'btn-delete'}
+                    onClick={async () => {
+                      if (usuarioEdit._id === user._id) return;
+                      const nuevoEstado = !activo;
+                      const ok = await confirmDialog(
+                        nuevoEstado ? `¿Activar a ${nombre}?` : `¿Desactivar a ${nombre}?`,
+                        nuevoEstado
+                          ? 'El usuario podrá ingresar al sistema.'
+                          : 'El usuario no podrá ingresar al sistema.',
+                        nuevoEstado ? 'Activar' : 'Desactivar'
+                      );
+                      if (ok) setActivo(nuevoEstado);
+                    }}
+                    disabled={usuarioEdit._id === user._id}
+                  >
+                    {activo ? 'Activo' : 'Inactivo'}
+                  </button>
+                  {usuarioEdit._id === user._id && (
+                    <span className="form-hint" style={{ marginTop: 0, marginLeft: 10 }}>
+                      (No puedes desactivarte)
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="form-actions">
@@ -232,6 +262,7 @@ function AdminUsers() {
           loading ? (
             <div className="table-loading">Cargando listado de usuarios...</div>
           ) : (
+          <div className="admin-table-container">
             <table className="admin-table">
               <thead>
                 <tr>
@@ -292,6 +323,7 @@ function AdminUsers() {
                 )}
               </tbody>
             </table>
+          </div>
           )
         )}
       </div>

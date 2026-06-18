@@ -3,6 +3,7 @@ import axios from 'axios';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
 import ProductForm from '../../components/Admin/ProductForm';
 import { useAuth } from '../../context/AuthContext';
+import { confirmDialog, toastSuccess, toastError } from '../../utils/alerts';
 import '../../components/Admin/Admin.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -32,7 +33,7 @@ function AdminProductos() {
       })
       .catch((err) => {
         console.error("Error productos activos:", err.response || err);
-        alert('Error al cargar productos');
+        toastError('Error al cargar productos');
       });
   };
 
@@ -52,11 +53,10 @@ function AdminProductos() {
       })
       .catch((err) => {
         console.error("Error productos inactivos:", err.response || err);
-        alert('Error al cargar productos inactivos');
+        toastError('Error al cargar productos inactivos');
       });
   };
 
-  // 3. Asegurá que el useEffect vigile de cerca cuándo aparece el token
   useEffect(() => {
     if (!loading && token) {
       cargarProductos();
@@ -65,32 +65,37 @@ function AdminProductos() {
 
   }, [loading, token]);
 
-  const handleBaja = (id) => {
-    if (!confirm('Dar de baja este producto?')) return;
+  const handleBaja = async (id) => {
+    const ok = await confirmDialog(
+      '¿Dar de baja este producto?',
+      'El producto quedará inactivo y no aparecerá en el catálogo.',
+      'Dar de baja'
+    );
+    if (!ok) return;
     const config = { headers: { 'Authorization': `Bearer ${token}` } };
-    axios.delete(`${API_URL}/api/productos/${id}`, config) // <-- Pasamos el config
+    axios.delete(`${API_URL}/api/productos/${id}`, config)
       .then(() => {
-        alert('Producto dado de baja');
+        toastSuccess('Producto dado de baja');
         cargarProductos();
         cargarInactivos();
       })
       .catch((err) => {
         const msj = err.response?.data?.error || err.message || 'Error desconocido';
-        alert(`Error al dar de baja el producto: ${msj}`);
+        toastError(`Error al dar de baja: ${msj}`);
       });
   };
 
   const handleRestaurar = (id) => {
     const config = { headers: { 'Authorization': `Bearer ${token}` } };
-    axios.patch(`${API_URL}/api/productos/${id}/restaurar`, {}, config) // <-- Pasamos el config (el segundo parámetro es el body, enviamos vacío)
+    axios.patch(`${API_URL}/api/productos/${id}/restaurar`, {}, config)
       .then(() => {
-        alert('Producto restaurado');
+        toastSuccess('Producto restaurado');
         cargarProductos();
         cargarInactivos();
       })
       .catch((err) => {
         const msj = err.response?.data?.error || err.message || 'Error desconocido';
-        alert(`Error al restaurar el producto: ${msj}`);
+        toastError(`Error al restaurar: ${msj}`);
       });
   };
 
@@ -109,11 +114,11 @@ function AdminProductos() {
     setMostrarForm(false);
     setProductoEditando(null);
     cargarProductos();
-    cargarInactivos(); // Es clave recargar ambos estados para mantener la consistencia
+    cargarInactivos();
   };
 
   if (loading) {
-    return <div className="admin-layout"><p>Cargando panel de administración...</p></div>;
+    return <div className="admin-layout"><p className="loading-center">Cargando panel de administración...</p></div>;
   }
 
 
@@ -155,7 +160,8 @@ function AdminProductos() {
             {mostrarInactivos ? 'No hay productos dados de baja' : 'No hay productos cargados'}
           </p>
         ) : (
-          <table className="admin-table">
+          <div className="admin-table-container">
+            <table className="admin-table">
             <thead>
               <tr>
                 <th>Imagen</th>
@@ -198,6 +204,7 @@ function AdminProductos() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

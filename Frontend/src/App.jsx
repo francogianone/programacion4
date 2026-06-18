@@ -24,10 +24,10 @@ import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 function AppContent() {
   return (
     <>
-      <Navbar titulo="Libreria" />
+      <Navbar />
 
       <Routes>
-        {/* Rutas Públicas */}
+
         <Route path="/" element={<Home />} />
         <Route path="/productos" element={<Products />} />
         <Route path="/contacto" element={<Contact />} />
@@ -38,64 +38,63 @@ function AppContent() {
         <Route path="/recuperar-contrasena" element={<ForgotPassword />} />
         <Route path="/restablecer-contrasena" element={<ResetPassword />} />
 
-        {/* Rutas Privadas de Usuario Cliente */}
-        <Route 
-          path="/perfil" 
+
+        <Route
+          path="/perfil"
           element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/mis-compras" 
+        <Route
+          path="/mis-compras"
           element={
             <ProtectedRoute>
               <MisCompras />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/checkout" 
+        <Route
+          path="/checkout"
           element={
             <ProtectedRoute>
               <Checkout />
             </ProtectedRoute>
-          } 
+          }
         />
 
-        {/* Rutas Privadas de Administrador */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <AdminRoute>
               <AdminPanel />
             </AdminRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin/productos" 
+        <Route
+          path="/admin/productos"
           element={
             <AdminRoute>
               <AdminProductos />
             </AdminRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin/ordenes" 
+        <Route
+          path="/admin/ordenes"
           element={
             <AdminRoute>
               <AdminOrdenes />
             </AdminRoute>
-          } 
+          }
         />
-        <Route 
-          path="/admin/usuarios" 
+        <Route
+          path="/admin/usuarios"
           element={
             <AdminRoute>
               <AdminUsers />
             </AdminRoute>
-          } 
+          }
         />
       </Routes>
 

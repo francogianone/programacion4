@@ -8,7 +8,7 @@ function OrderSummary() {
     <div className="order-summary">
       <h3 className="order-summary__title">Tu pedido</h3>
       <ul className="order-summary__list">
-        {cartItems.map((item) => (
+        {cartItems.filter(item => !item.agotado).map((item) => (
           <li key={item.id} className="order-summary__item">
             <span className="order-summary__name">
               {item.nombre} x{item.quantity}

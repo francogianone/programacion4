@@ -121,9 +121,10 @@ function Profile() {
               <input
                 id="contrasena"
                 type="password"
-                placeholder="Dejar en blanco si no quieres cambiarla"
+                placeholder="Dejar en blanco para no cambiarla"
                 value={contrasena}
                 onChange={(e) => setContrasena(e.target.value)}
+                autoComplete="new-password"
               />
             </div>
 
@@ -135,6 +136,7 @@ function Profile() {
                 placeholder="Repite tu nueva contraseña"
                 value={confirmarContrasena}
                 onChange={(e) => setConfirmarContrasena(e.target.value)}
+                autoComplete="new-password"
               />
             </div>
 
@@ -144,9 +146,10 @@ function Profile() {
                 <input
                   id="contrasenaVieja"
                   type="password"
-                  placeholder="Introduce tu contraseña actual para autorizar el cambio"
+                  placeholder="Contraseña actual"
                   value={contrasenaVieja}
                   onChange={(e) => setContrasenaVieja(e.target.value)}
+                  autoComplete="current-password"
                   required
                 />
               </div>

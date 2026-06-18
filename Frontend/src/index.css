@@ -1,24 +1,114 @@
+/* ─── Google Fonts ────────────────────────────────────── */
+/* Inter is loaded via index.html preconnect */
+
+/* ─── Design System Tokens ───────────────────────────── */
 :root {
-  --primary: #005b82;
-  --primary-hover: #004563;
-  --bg-color: #ffffff;
-  --card-bg: #ffffff;
-  --text-main: #333333;
-  --text-muted: #666666;
-  --border: #e0e0e0;
-  --btn-green: #388e3c;
-  --btn-green-hover: #2e7d32;
+  /* Brand */
+  --brand: #3b5249;
+  /* verde bosque profundo */
+  --brand-hover: #2e4039;
+  --brand-light: #edf2f0;
+  /* tinte muy claro del brand */
+
+  /* Neutrals — escala paper/ink */
+  --paper: #faf9f7;
+  /* fondo general, crema suave */
+  --surface: #ffffff;
+  /* cards, paneles */
+  --surface-alt: #f3f2ef;
+  /* fondo alternativo */
+
+  --ink: #1a1a1a;
+  /* texto principal */
+  --ink-soft: #4a4a4a;
+  /* texto secundario */
+  --ink-muted: #9a9a9a;
+  /* placeholders, meta */
+
+  --border: #e4e0da;
+  /* bordes sutiles */
+  --border-strong: #c9c4bc;
+  /* bordes más visibles */
+
+  /* Feedback */
+  --danger: #b83a2e;
+  --danger-light: #fdf0ef;
+  --success: #2d6a4f;
+  --success-light: #edf6f1;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.10);
+
+  /* Transitions */
+  --transition: 0.2s ease;
+
+  /* Legacy aliases (para no romper Admin.css) */
+  --primary: var(--brand);
+  --primary-hover: var(--brand-hover);
+  --bg-color: var(--paper);
+  --card-bg: var(--surface);
+  --text-main: var(--ink);
+  --text-muted: var(--ink-muted);
+  --btn-green: var(--success);
+  --btn-green-hover: var(--brand-hover);
 }
 
-* {
+/* ─── Reset ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ─── Base ───────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f7f7f7;
-  color: var(--text-main);
-  line-height: 1.5;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ─── Global form inputs ─────────────────────────────── */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* Placeholder desaparece al hacer foco y vuelve al perder foco */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+input::placeholder,
+textarea::placeholder {
+  transition: opacity 0.2s ease;
 }

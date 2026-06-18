@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Eye, EyeOff } from 'lucide-react';
 import '../Auth.css';
 import '../../components/Admin/Admin.css';
 import './Login.css';
@@ -76,10 +77,10 @@ function Login() {
               <input
                 id="contrasena"
                 type={mostrarContrasena ? 'text' : 'password'}
-                placeholder="••••••••"
+                placeholder="Tu contraseña"
                 value={contrasena}
                 onChange={(e) => setContrasena(e.target.value)}
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
               />
               <button
@@ -88,7 +89,7 @@ function Login() {
                 onClick={() => setMostrarContrasena((v) => !v)}
                 aria-label={mostrarContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'}
               >
-                {mostrarContrasena ? '🙈' : '👁️'}
+                {mostrarContrasena ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>

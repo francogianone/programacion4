@@ -1,18 +1,43 @@
 import { useState } from 'react';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import './Contact.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function Contact() {
   const [form, setForm] = useState({ nombre: '', email: '', mensaje: '' });
-  const [enviado, setEnviado] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setEnviado(true);
-    setForm({ nombre: '', email: '', mensaje: '' });
+    setEnviando(true);
+    
+    try {
+      await axios.post(`${API_URL}/api/contacto`, form);
+      setForm({ nombre: '', email: '', mensaje: '' });
+      Swal.fire({
+        title: '¡Mensaje enviado!',
+        text: 'Hemos recibido tu consulta y te responderemos a la brevedad.',
+        icon: 'success',
+        confirmButtonColor: 'var(--brand)',
+        confirmButtonText: 'Aceptar'
+      });
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Hubo un problema al enviar tu mensaje. Intenta nuevamente más tarde.',
+        icon: 'error',
+        confirmButtonColor: 'var(--brand)',
+        confirmButtonText: 'Cerrar'
+      });
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -23,11 +48,6 @@ function Contact() {
           Completá el formulario y nos comunicaremos a la brevedad.
         </p>
 
-        {enviado && (
-          <div className="contact-success">
-            Tu mensaje fue enviado. Te responderemos pronto.
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="contact-form">
           <div className="contact-field">
@@ -69,7 +89,9 @@ function Contact() {
             />
           </div>
 
-          <button type="submit" className="contact-btn">Enviar mensaje</button>
+          <button type="submit" className="contact-btn" disabled={enviando}>
+            {enviando ? 'Enviando...' : 'Enviar mensaje'}
+          </button>
         </form>
 
         <div className="contact-info">

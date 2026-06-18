@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useCart } from '../../context/CartContext.jsx';
 import { Link } from 'react-router-dom';
 import CartItem from '../../components/Cart/CartItem';
@@ -6,7 +7,13 @@ import OrderSummary from '../../components/Cart/OrderSummary';
 import '../../components/Cart/Cart.css';
 
 function Cart() {
-  const { cartItems, clearCart } = useCart();
+  const { cartItems, clearCart, syncCartStock } = useCart();
+
+  useEffect(() => {
+    syncCartStock();
+  }, [syncCartStock]);
+
+  const validItems = cartItems.filter(item => !item.agotado);
 
   if (cartItems.length === 0) {
     return (
@@ -31,10 +38,12 @@ function Cart() {
             <CartItem key={item.id} item={item} />
           ))}
         </div>
-        <aside className="cart-sidebar">
-          <OrderSummary />
-          <CartSummary />
-        </aside>
+        {validItems.length > 0 && (
+          <aside className="cart-sidebar">
+            <OrderSummary />
+            <CartSummary />
+          </aside>
+        )}
       </div>
     </div>
   );

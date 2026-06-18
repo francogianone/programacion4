@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { toastSuccess, toastError } from '../../utils/alerts';
 import './Admin.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -49,7 +50,7 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           stock: Number(form.stock || 0)
         }, config);
 
-        alert('Producto creado correctamente');
+        toastSuccess('Producto creado correctamente');
         setForm(camposVacios);
       } else {
         await axios.put(`${API_URL}/api/productos/${productoInicial._id}`, {
@@ -58,12 +59,12 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           stock: Number(form.stock || 0)
         }, config);
 
-        alert('Producto actualizado correctamente');
+        toastSuccess('Producto actualizado correctamente');
       }
       if (onSuccess) onSuccess();
     } catch (err) {
       const mensaje = err.response?.data?.error || 'Error inesperado';
-      alert(`Error: ${mensaje}`);
+      toastError(`Error: ${mensaje}`);
     } finally {
       setEnviando(false);
     }
@@ -88,29 +89,58 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
         />
       </div>
 
-      <div className="form-group">
-        <label htmlFor="precio">Precio</label>
-        <input
-          id="precio"
-          name="precio"
-          type="number"
-          min="0"
-          value={form.precio}
-          onChange={handleChange}
-          required
-        />
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="precio">Precio</label>
+          <input
+            id="precio"
+            name="precio"
+            type="number"
+            min="0"
+            value={form.precio}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="stock">Stock</label>
+          <input
+            id="stock"
+            name="stock"
+            type="number"
+            min="0"
+            value={form.stock}
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
 
-      <div className="form-group">
-        <label htmlFor="categoria">Categoria</label>
-        <input
-          id="categoria"
-          name="categoria"
-          type="text"
-          value={form.categoria}
-          onChange={handleChange}
-          required
-        />
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="categoria">Categoria</label>
+          <input
+            id="categoria"
+            name="categoria"
+            type="text"
+            value={form.categoria}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="imagen">URL de imagen</label>
+          <input
+            id="imagen"
+            name="imagen"
+            type="text"
+            value={form.imagen}
+            onChange={handleChange}
+            placeholder="https://"
+          />
+        </div>
       </div>
 
       <div className="form-group">
@@ -121,31 +151,6 @@ function ProductForm({ modo = 'crear', productoInicial = null, onSuccess }) {
           rows={3}
           value={form.descripcion}
           onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="imagen">URL de imagen</label>
-        <input
-          id="imagen"
-          name="imagen"
-          type="text"
-          value={form.imagen}
-          onChange={handleChange}
-          placeholder="https://"
-        />
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="stock">Stock</label>
-        <input
-          id="stock"
-          name="stock"
-          type="number"
-          min="0"
-          value={form.stock}
-          onChange={handleChange}
-          required
         />
       </div>
 

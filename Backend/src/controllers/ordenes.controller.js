@@ -1,5 +1,7 @@
 const Orden = require('../models/Orden');
 const Producto = require('../models/Producto');
+const Usuario = require('../models/Usuario');
+const { enviarConfirmacionPedido, enviarActualizacionEstado } = require('../config/mailer');
 
 const crearOrden = async (req, res) => {
   try {
@@ -85,6 +87,13 @@ const crearOrden = async (req, res) => {
       await Producto.findByIdAndUpdate(item.producto, { $inc: { stock: -item.cantidad } });
     }
 
+    // Enviar email de confirmacion al cliente (no bloquea la respuesta)
+    try {
+      await enviarConfirmacionPedido(req.usuario.email, nuevaOrden);
+    } catch (mailError) {
+      console.error('Error al enviar email de confirmacion de pedido:', mailError.message);
+    }
+
     res.status(201).json(nuevaOrden);
   } catch (error) {
     res.status(500).json({ error: 'Error al crear la orden' });
@@ -94,6 +103,7 @@ const crearOrden = async (req, res) => {
 const obtenerMisOrdenes = async (req, res) => {
   try {
     const ordenes = await Orden.find({ usuario: req.usuario._id, activo: true })
+      .populate('productos.producto')
       .sort({ createdAt: -1 });
     res.status(200).json(ordenes);
   } catch (error) {
@@ -143,6 +153,16 @@ const actualizarEstadoOrden = async (req, res) => {
 
     if (!orden) {
       return res.status(404).json({ error: 'Orden no encontrada' });
+    }
+
+    // Notificar al cliente automaticamente al cambiar el estado
+    try {
+      const usuario = await Usuario.findById(orden.usuario).select('email');
+      if (usuario?.email) {
+        await enviarActualizacionEstado(usuario.email, orden);
+      }
+    } catch (mailError) {
+      console.error('Error al enviar email de actualizacion de estado:', mailError.message);
     }
 
     res.status(200).json(orden);

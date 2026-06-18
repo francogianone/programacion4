@@ -4,6 +4,7 @@ import ProductCard from '../../components/Cards/ProductCard';
 import CategoryFilter from '../../components/Filters/CategoryFilter';
 import SearchBar from '../../components/Filters/SearchBar';
 import PriceFilter from '../../components/Filters/PriceFilter';
+import { PageLoader, PageError } from '../../components/UI/PageLoader';
 import './Products.css';
 import '../../components/Filters/Filters.css';
 
@@ -67,26 +68,30 @@ function Products() {
     return result;
   }, [products, selectedCategory, searchTerm, priceMin, priceMax, sortOrder]);
 
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <PageLoader text="Cargando catálogo..." />;
+  if (error) return <PageError text={error} />;
 
   return (
     <div className="products-page">
       <div className="filter-bar">
-        <SearchBar value={searchTerm} onChange={setSearchTerm} />
-        <CategoryFilter
-          categories={categories}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-        />
-        <PriceFilter
-          minValue={priceMin}
-          maxValue={priceMax}
-          sortOrder={sortOrder}
-          onMinChange={setPriceMin}
-          onMaxChange={setPriceMax}
-          onSortChange={setSortOrder}
-        />
+        <div className="filter-bar__row">
+          <SearchBar value={searchTerm} onChange={setSearchTerm} />
+          <PriceFilter
+            minValue={priceMin}
+            maxValue={priceMax}
+            sortOrder={sortOrder}
+            onMinChange={setPriceMin}
+            onMaxChange={setPriceMax}
+            onSortChange={setSortOrder}
+          />
+        </div>
+        <div className="filter-bar__row filter-bar__row--cats">
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onChange={setSelectedCategory}
+          />
+        </div>
       </div>
       <div className="products-container">
         {filteredProducts.length === 0 ? (

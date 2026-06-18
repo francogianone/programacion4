@@ -1,39 +1,42 @@
 .contact-container {
   display: flex;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 60px 20px;
+  background-color: var(--paper);
+  min-height: calc(100vh - 62px);
 }
 
 .contact-card {
-  background-color: var(--card-bg);
+  background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 36px;
+  border-radius: 14px;
+  padding: 40px 36px;
   width: 100%;
-  max-width: 520px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  max-width: 650px;
+  box-shadow: var(--shadow-md);
+  height: fit-content;
 }
 
 .contact-card h2 {
-  font-size: 22px;
-  color: var(--text-main);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
   margin-bottom: 8px;
-  text-align: center;
+  letter-spacing: -0.5px;
 }
 
 .contact-sub {
   font-size: 14px;
-  color: var(--text-muted);
-  text-align: center;
-  margin-bottom: 24px;
+  color: var(--ink-muted);
+  margin-bottom: 28px;
 }
 
 .contact-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  border-radius: 6px;
-  padding: 10px 14px;
+  background-color: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(45,106,79,0.2);
+  border-radius: 8px;
+  padding: 12px 14px;
   font-size: 13px;
   margin-bottom: 20px;
 }
@@ -41,7 +44,7 @@
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .contact-field {
@@ -53,47 +56,63 @@
 .contact-field label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--ink);
+  letter-spacing: 0.1px;
 }
 
 .contact-field input,
 .contact-field textarea {
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 9px 12px;
+  border-radius: 8px;
+  padding: 10px 14px;
   font-size: 14px;
-  font-family: inherit;
-  color: var(--text-main);
-  background-color: #fff;
+  color: var(--ink);
+  background-color: var(--paper);
   resize: vertical;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.contact-field input::placeholder,
+.contact-field textarea::placeholder {
+  color: var(--ink-muted);
 }
 
 .contact-field input:focus,
 .contact-field textarea:focus {
-  border-color: var(--primary);
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(26,26,26,0.06);
 }
 
 .contact-btn {
-  padding: 10px;
-  background-color: var(--primary);
+  padding: 12px;
+  background-color: var(--ink);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition), transform var(--transition);
 }
 
 .contact-btn:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--brand);
+  transform: translateY(-1px);
 }
 
 .contact-info {
-  margin-top: 20px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
   text-align: center;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--ink-muted);
+}
+
+/* ─── Responsive ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  .contact-card {
+    padding: 28px 20px;
+  }
 }
