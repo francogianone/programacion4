@@ -71,7 +71,7 @@ function Checkout() {
 
       const res = await axios.post(`${API_URL}/api/ordenes`, payload);
       clearCart();
-      setConfirmacion({ orden: res.data, metodoPago });
+      setConfirmacion({ orden: res.data, metodoPago, emailNotificado: res.data.emailNotificado !== false });
     } catch (err) {
       setError(err.response?.data?.error || 'Error al procesar el pedido. Intenta nuevamente.');
     } finally {
@@ -88,6 +88,12 @@ function Checkout() {
           <p className="checkout-confirmacion__sub">
             Tu pedido <strong>#{confirmacion.orden._id.slice(-8).toUpperCase()}</strong> fue registrado correctamente.
           </p>
+
+          {!confirmacion.emailNotificado && (
+            <p className="checkout-confirmacion__email-warning">
+              ⚠ No se pudo enviar la confirmación por email. Tu pedido está registrado sin inconvenientes — el aviso de correo es temporal.
+            </p>
+          )}
 
           {confirmacion.metodoPago === 'transferencia' && (
             <div className="checkout-datos-bancarios">

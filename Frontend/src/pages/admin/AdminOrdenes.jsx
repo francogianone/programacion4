@@ -60,15 +60,18 @@ function AdminOrdenes() {
 
     try {
       const res = await axios.patch(`${API_URL}/api/ordenes/${id}/estado`, { estado });
+      const emailNotificado = res.data.emailNotificado !== false;
       setOrdenes(prev =>
         prev.map(o => o._id === id ? { ...o, estado: res.data.estado } : o)
       );
 
-      // 3. Exito
+      // 3. Resultado
       await Swal.fire({
-        title: '¡Estado actualizado!',
-        html: `El estado fue cambiado a <strong>${estadoLabel}</strong> y se notificó al cliente por email.`,
-        icon: 'success',
+        title: emailNotificado ? '¡Estado actualizado!' : 'Estado actualizado',
+        html: emailNotificado
+          ? `El estado fue cambiado a <strong>${estadoLabel}</strong> y se notificó al cliente por email.`
+          : `El estado fue cambiado a <strong>${estadoLabel}</strong>.<br><br><small style="color:#b45309">⚠ No se pudo notificar al cliente por email. El cambio se guardó correctamente — el inconveniente es temporal.</small>`,
+        icon: emailNotificado ? 'success' : 'warning',
         confirmButtonText: 'Aceptar',
         confirmButtonColor: '#1a1a1a'
       });

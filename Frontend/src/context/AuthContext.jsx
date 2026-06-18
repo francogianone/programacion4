@@ -130,7 +130,11 @@ export function AuthProvider({ children }) {
   const recuperarContrasena = async (email) => {
     try {
       const response = await axios.post(`${API_URL}/api/usuarios/recuperar-contrasena`, { email });
-      return { success: true, message: response.data.mensaje };
+      return {
+        success: true,
+        message: response.data.mensaje,
+        emailEnviado: response.data.emailEnviado !== false
+      };
     } catch (error) {
       const errorMsg = error.response?.data?.error || 'Error al solicitar la recuperación';
       return { success: false, error: errorMsg };

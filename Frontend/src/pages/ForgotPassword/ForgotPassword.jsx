@@ -28,7 +28,11 @@ function ForgotPassword() {
     setLoading(false);
 
     if (result.success) {
-      setSuccess(result.message || 'Se ha enviado un enlace de recuperación a tu correo electrónico.');
+      if (result.emailEnviado === false) {
+        setError('La solicitud se procesó, pero no se pudo enviar el correo de recuperación en este momento. Intentá nuevamente más tarde.');
+      } else {
+        setSuccess(result.message || 'Se ha enviado un enlace de recuperación a tu correo electrónico.');
+      }
       setEmail('');
     } else {
       setError(result.error);

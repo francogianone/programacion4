@@ -247,6 +247,7 @@ const recuperarContrasena = async (req, res) => {
     const enlaceRestablecer = `${frontendUrl}/restablecer-contrasena?token=${token}`;
 
     // Enviar correo de recuperación a través de Gmail
+    let emailEnviado = false;
     try {
       await transporter.sendMail({
         from: `"Soporte" <${process.env.GMAIL_USER}>`,
@@ -262,13 +263,15 @@ const recuperarContrasena = async (req, res) => {
           </div>
         `
       });
+      emailEnviado = true;
       console.log(`✓ Email de recuperación enviado a: ${usuario.email}`);
     } catch (mailError) {
       console.error('Error al enviar email:', mailError.message);
     }
 
     res.status(200).json({ 
-      mensaje: 'Si el correo está registrado, recibirás un enlace de recuperación.'
+      mensaje: 'Si el correo está registrado, recibirás un enlace de recuperación.',
+      emailEnviado
     });
   } catch (error) {
     console.error('Error en recuperarContrasena:', error);

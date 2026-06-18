@@ -88,13 +88,15 @@ const crearOrden = async (req, res) => {
     }
 
     // Enviar email de confirmacion al cliente (no bloquea la respuesta)
+    let emailNotificado = true;
     try {
       await enviarConfirmacionPedido(req.usuario.email, nuevaOrden);
     } catch (mailError) {
+      emailNotificado = false;
       console.error('Error al enviar email de confirmacion de pedido:', mailError.message);
     }
 
-    res.status(201).json(nuevaOrden);
+    res.status(201).json({ ...nuevaOrden.toObject(), emailNotificado });
   } catch (error) {
     res.status(500).json({ error: 'Error al crear la orden' });
   }
@@ -156,16 +158,20 @@ const actualizarEstadoOrden = async (req, res) => {
     }
 
     // Notificar al cliente automaticamente al cambiar el estado
+    let emailNotificado = true;
     try {
       const usuario = await Usuario.findById(orden.usuario).select('email');
       if (usuario?.email) {
         await enviarActualizacionEstado(usuario.email, orden);
+      } else {
+        emailNotificado = false;
       }
     } catch (mailError) {
+      emailNotificado = false;
       console.error('Error al enviar email de actualizacion de estado:', mailError.message);
     }
 
-    res.status(200).json(orden);
+    res.status(200).json({ ...orden.toObject(), emailNotificado });
   } catch (error) {
     res.status(500).json({ error: 'Error al actualizar estado de la orden' });
   }
