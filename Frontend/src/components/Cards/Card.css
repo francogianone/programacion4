@@ -133,6 +133,37 @@
   gap: 8px;
 }
 
+@media (max-width: 768px) {
+  .card__image-wrap {
+    height: 150px;
+  }
+
+  .card__body {
+    padding: 12px;
+  }
+
+  .card__title {
+    font-size: 13px;
+  }
+
+  .card__description {
+    display: none;
+  }
+
+  .card__actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .card__btn-detail,
+  .card__btn-cart {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
 .card__btn-detail {
   display: inline-flex;
   align-items: center;

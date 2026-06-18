@@ -37,7 +37,7 @@ function Contact() {
           confirmButtonText: 'Aceptar'
         });
       }
-    } catch (error) {
+    } catch {
       Swal.fire({
         title: 'Error',
         text: 'Hubo un problema al enviar tu mensaje. Intenta nuevamente más tarde.',

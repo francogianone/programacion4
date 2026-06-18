@@ -55,9 +55,9 @@
   }
 
   .products-container {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    padding: 16px 16px 36px;
+    padding: 16px 12px 36px;
   }
 
   .card {
@@ -67,7 +67,8 @@
 
 @media (max-width: 400px) {
   .products-container {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 10px;
+    padding: 12px 12px 36px;
   }
 }
