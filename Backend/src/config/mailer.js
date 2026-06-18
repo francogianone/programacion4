@@ -160,6 +160,7 @@ const enviarActualizacionEstado = async (emailDestino, orden) => {
 
 module.exports = {
   transporter,
+  sendMailSafe,
   enviarConfirmacionPedido,
   enviarActualizacionEstado
 };

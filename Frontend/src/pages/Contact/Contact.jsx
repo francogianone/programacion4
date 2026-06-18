@@ -18,15 +18,25 @@ function Contact() {
     setEnviando(true);
     
     try {
-      await axios.post(`${API_URL}/api/contacto`, form);
+      const res = await axios.post(`${API_URL}/api/contacto`, form);
       setForm({ nombre: '', email: '', mensaje: '' });
-      Swal.fire({
-        title: '¡Mensaje enviado!',
-        text: 'Hemos recibido tu consulta y te responderemos a la brevedad.',
-        icon: 'success',
-        confirmButtonColor: 'var(--brand)',
-        confirmButtonText: 'Aceptar'
-      });
+      if (res.data.emailEnviado === false) {
+        Swal.fire({
+          title: 'Mensaje recibido',
+          text: 'Recibimos tu consulta, pero no pudimos enviarte una notificación por email en este momento. Nos comunicaremos a la brevedad.',
+          icon: 'warning',
+          confirmButtonColor: 'var(--brand)',
+          confirmButtonText: 'Aceptar'
+        });
+      } else {
+        Swal.fire({
+          title: '¡Mensaje enviado!',
+          text: 'Hemos recibido tu consulta y te responderemos a la brevedad.',
+          icon: 'success',
+          confirmButtonColor: 'var(--brand)',
+          confirmButtonText: 'Aceptar'
+        });
+      }
     } catch (error) {
       Swal.fire({
         title: 'Error',
