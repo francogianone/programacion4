@@ -59,12 +59,21 @@ const ordenSchema = new mongoose.Schema({
   },
   metodoPago: {
     type: String,
-    enum: ['transferencia', 'efectivo'],
+    enum: ['transferencia', 'efectivo', 'mercadopago'],
     required: true
+  },
+  mercadopagoPreferenceId: {
+    type: String,
+    default: null
+  },
+  mercadopagoStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected', 'in_process', null],
+    default: null
   },
   tipoEntrega: {
     type: String,
-    enum: ['envio', 'retiro'],
+    enum: ['envio', 'retiro', 'correo'],
     required: true
   },
   datosFacturacion: {
@@ -73,6 +82,9 @@ const ordenSchema = new mongoose.Schema({
   },
   datosEnvio: {
     type: datosEnvioSchema,
+    required: function () {
+      return this.tipoEntrega === 'envio' || this.tipoEntrega === 'correo';
+    },
     default: null
   },
   activo: {

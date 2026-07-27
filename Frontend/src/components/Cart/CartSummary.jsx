@@ -3,18 +3,16 @@ import { useCart } from '../../context/CartContext.jsx';
 import { useAuth } from '../../context/AuthContext';
 import './Cart.css';
 
-const COSTO_ENVIO = 2000;
-
 function CartSummary() {
-  const { cartTotal } = useCart();
+  const { cartTotal, envioSeleccionado, totalConEnvio } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const total = cartTotal + COSTO_ENVIO;
+  const costoEnvio = envioSeleccionado?.costoEnvio || 0;
 
   const handleFinalizarCompra = () => {
     if (!user) {
-      navigate('/login?redirect=/carrito');
+      navigate('/login?redirect=/checkout');
       return;
     }
     navigate('/checkout');
@@ -25,15 +23,15 @@ function CartSummary() {
       <h3 className="cart-summary__title">Resumen de pago</h3>
       <div className="cart-summary__row">
         <span>Subtotal</span>
-        <span>${cartTotal}</span>
+        <span>${cartTotal.toLocaleString('es-AR')}</span>
       </div>
       <div className="cart-summary__row">
-        <span>Envio</span>
-        <span>${COSTO_ENVIO}</span>
+        <span>Envío</span>
+        <span>{costoEnvio === 0 ? 'Gratis' : `$${costoEnvio.toLocaleString('es-AR')}`}</span>
       </div>
       <div className="cart-summary__row cart-summary__total">
         <span>Total</span>
-        <span>${total}</span>
+        <span>${totalConEnvio.toLocaleString('es-AR')}</span>
       </div>
       <button
         className="cart-summary__btn"
@@ -43,8 +41,8 @@ function CartSummary() {
       </button>
       {!user && (
         <p className="cart-summary__auth-hint">
-          <Link to="/login?redirect=/carrito">Iniciá sesión</Link> o{' '}
-          <Link to="/register?redirect=/carrito">registrate</Link> para continuar.
+          <Link to="/login?redirect=/checkout">Iniciá sesión</Link> o{' '}
+          <Link to="/register?redirect=/checkout">registrate</Link> para continuar.
         </p>
       )}
     </div>

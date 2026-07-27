@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [product, setProduct] = useState([]);
 
   // Cargar token y usuario desde localStorage al iniciar
   useEffect(() => {
@@ -153,8 +152,6 @@ export function AuthProvider({ children }) {
       const errorMsg = error.response?.data?.error || 'Error al restablecer la contraseña';
       return { success: false, error: errorMsg };
     }
-
-
   };
 
   return (
@@ -162,11 +159,9 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-
-
-
 }
 
-export function useAuth() {
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
   return useContext(AuthContext);
-}
+};

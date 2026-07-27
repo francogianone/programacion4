@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import AdminNavbar from '../../components/Admin/AdminNavbar';
+import Swal from 'sweetalert2';
 import { confirmDialog, toastError } from '../../utils/alerts';
 import '../../components/Admin/Admin.css';
 
@@ -25,7 +26,7 @@ function AdminUsers() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState('');
 
-  const fetchUsuarios = async () => {
+  const fetchUsuarios = useCallback(async () => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_URL}/api/usuarios`);
@@ -35,13 +36,14 @@ function AdminUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (user && user.rol === 'admin') {
+      // eslint-disable-next-line
       fetchUsuarios();
     }
-  }, [user]);
+  }, [user, fetchUsuarios]);
 
   if (authLoading) {
     return <div className="loading-center">Verificando autenticación...</div>;
@@ -104,6 +106,43 @@ function AdminUsers() {
       fetchUsuarios();
     } catch (err) {
       toastError(err.response?.data?.error || 'Error al restaurar el usuario');
+    } finally {
+      setAccionando(null);
+    }
+  };
+
+  const handleEliminar = async (u) => {
+    const { value: contrasena } = await Swal.fire({
+      title: `Eliminar a ${u.nombre}`,
+      html: 'Esta acción es <strong>irreversible</strong>. El usuario será eliminado definitivamente de la base de datos.',
+      icon: 'warning',
+      input: 'password',
+      inputLabel: 'Contraseña de administrador',
+      inputPlaceholder: 'Ingresá la contraseña de admin',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar definitivamente',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#e4e0da',
+      reverseButtons: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Debés ingresar la contraseña de administrador';
+        }
+        return null;
+      }
+    });
+
+    if (!contrasena) return;
+
+    setAccionando(u._id);
+    try {
+      await axios.delete(`${API_URL}/api/usuarios/${u._id}`, {
+        data: { contrasenaAdmin: contrasena }
+      });
+      fetchUsuarios();
+    } catch (err) {
+      toastError(err.response?.data?.error || 'Error al eliminar el usuario');
     } finally {
       setAccionando(null);
     }
@@ -315,6 +354,15 @@ function AdminUsers() {
                             disabled={accionando === u._id}
                           >
                             {accionando === u._id ? '...' : 'Restaurar'}
+                          </button>
+                        )}
+                        {u._id !== user._id && (
+                          <button
+                            className="btn-delete btn-delete--danger"
+                            onClick={() => handleEliminar(u)}
+                            disabled={accionando === u._id}
+                          >
+                            {accionando === u._id ? '...' : 'Eliminar'}
                           </button>
                         )}
                       </td>

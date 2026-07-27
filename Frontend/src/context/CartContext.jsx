@@ -14,9 +14,23 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Estado de cotización de envío
+  const [cotizacionEnvio, setCotizacionEnvio] = useState(() => {
+    const saved = localStorage.getItem('cotizacionEnvio');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    if (cotizacionEnvio) {
+      localStorage.setItem('cotizacionEnvio', JSON.stringify(cotizacionEnvio));
+    } else {
+      localStorage.removeItem('cotizacionEnvio');
+    }
+  }, [cotizacionEnvio]);
 
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -115,6 +129,36 @@ export const CartProvider = ({ children }) => {
   // 8. Total del carrito en dinero
   const cartTotal = validCartItems.reduce((total, item) => total + item.precio * item.quantity, 0);
 
+  const guardarCotizacion = (data) => {
+    setCotizacionEnvio(data);
+  };
+
+  const limpiarCotizacion = () => {
+    setCotizacionEnvio(null);
+  };
+
+  // Selección del tipo de entrega por parte del usuario en el carrito
+  const [envioSeleccionado, setEnvioSeleccionado] = useState(() => {
+    const saved = localStorage.getItem('envioSeleccionado');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  useEffect(() => {
+    if (envioSeleccionado) {
+      localStorage.setItem('envioSeleccionado', JSON.stringify(envioSeleccionado));
+    } else {
+      localStorage.removeItem('envioSeleccionado');
+    }
+  }, [envioSeleccionado]);
+
+  const seleccionarEnvio = (tipo, costo) => {
+    setEnvioSeleccionado({ tipo, costoEnvio: costo });
+  };
+
+  // Total final con envío
+  const getCostoEnvio = () => envioSeleccionado?.costoEnvio || 0;
+  const totalConEnvio = cartTotal + getCostoEnvio();
+
   return (
     <CartContext.Provider value={{
       cartItems,
@@ -125,7 +169,13 @@ export const CartProvider = ({ children }) => {
       clearCart,
       syncCartStock,
       cartQuantity,
-      cartTotal
+      cartTotal,
+      cotizacionEnvio,
+      guardarCotizacion,
+      limpiarCotizacion,
+      envioSeleccionado,
+      seleccionarEnvio,
+      totalConEnvio
     }}>
       {children}
     </CartContext.Provider>

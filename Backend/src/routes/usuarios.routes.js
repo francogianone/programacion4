@@ -10,6 +10,7 @@ const {
   actualizarUsuario,
   darDeBajaUsuario,
   restaurarUsuario,
+  eliminarUsuario,
   recuperarContrasena,
   restablecerContrasena
 } = require('../controllers/usuarios.controller');
@@ -32,5 +33,6 @@ router.get('/', autenticar, autorizar('admin'), obtenerUsuarios);
 router.put('/:id', autenticar, autorizar('admin'), actualizarUsuario);
 router.patch('/:id/baja', autenticar, autorizar('admin'), darDeBajaUsuario);
 router.patch('/:id/restaurar', autenticar, autorizar('admin'), restaurarUsuario);
+router.delete('/:id', autenticar, autorizar('admin'), eliminarUsuario);
 
 module.exports = router;

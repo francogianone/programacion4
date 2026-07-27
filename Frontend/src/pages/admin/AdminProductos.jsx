@@ -62,7 +62,7 @@ function AdminProductos() {
       cargarProductos();
       cargarInactivos();
     }
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, token]);
 
   const handleBaja = async (id) => {

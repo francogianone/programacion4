@@ -18,6 +18,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import MisCompras from './pages/MisCompras/MisCompras';
 import Checkout from './pages/Checkout/Checkout';
+import PagoResultado from './pages/Checkout/PagoResultado';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 
@@ -60,6 +61,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/checkout/resultado"
+          element={
+            <ProtectedRoute>
+              <PagoResultado />
             </ProtectedRoute>
           }
         />

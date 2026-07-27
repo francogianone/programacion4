@@ -18,7 +18,9 @@ function Profile() {
 
   useEffect(() => {
     if (user) {
+      // eslint-disable-next-line
       setNombre(user.nombre || '');
+      // eslint-disable-next-line
       setEmail(user.email || '');
     }
   }, [user]);

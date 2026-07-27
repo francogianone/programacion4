@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
-const { sendMailSafe } = require('../config/mailer');
+const { enviarMail } = require('../config/mailer');
 
 // Generar Token JWT
 const generarToken = (usuario) => {
@@ -241,7 +241,7 @@ const recuperarContrasena = async (req, res) => {
     // Enviar correo de recuperación a través de Gmail
     let emailEnviado = false;
     try {
-      await sendMailSafe({
+  await enviarMail({
         from: `"Soporte" <${process.env.GMAIL_USER}>`,
         to: usuario.email,
         subject: 'Recuperar contraseña',
@@ -354,6 +354,31 @@ const restaurarUsuario = async (req, res) => {
   }
 };
 
+const eliminarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { contrasenaAdmin } = req.body;
+
+    if (!contrasenaAdmin || contrasenaAdmin !== 'admin123') {
+      return res.status(403).json({ error: 'Contraseña de administrador incorrecta' });
+    }
+
+    if (id === req.usuario._id.toString()) {
+      return res.status(400).json({ error: 'No puedes eliminar tu propia cuenta' });
+    }
+
+    const usuario = await Usuario.findByIdAndDelete(id);
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.status(200).json({ mensaje: 'Usuario eliminado definitivamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el usuario' });
+  }
+};
+
 module.exports = {
   registrarUsuario,
   iniciarSesion,
@@ -363,6 +388,7 @@ module.exports = {
   actualizarUsuario,
   darDeBajaUsuario,
   restaurarUsuario,
+  eliminarUsuario,
   recuperarContrasena,
   restablecerContrasena
 };

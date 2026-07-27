@@ -99,7 +99,7 @@ function Register() {
           </button>
         </form>
         <div className="auth-footer">
-          ¿Ya tienes una cuenta? <Link to="/login">Inicia Sesión</Link>
+          ¿Ya tienes una cuenta? <Link to={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : '/login'}>Inicia Sesión</Link>
         </div>
       </div>
     </div>

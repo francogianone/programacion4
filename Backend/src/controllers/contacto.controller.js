@@ -1,4 +1,4 @@
-const { sendMailSafe } = require('../config/mailer');
+const { enviarMail } = require('../config/mailer');
 
 const enviarMensaje = async (req, res) => {
   try {
@@ -11,7 +11,7 @@ const enviarMensaje = async (req, res) => {
     const destino = process.env.GMAIL_USER;
 
     try {
-      await sendMailSafe({
+      await enviarMail({
         from: `"${nombre}" <${process.env.GMAIL_USER}>`,
         replyTo: email,
         to: destino,

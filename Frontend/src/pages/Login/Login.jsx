@@ -109,7 +109,7 @@ function Login() {
           <hr />
         </div>
 
-        <Link to="/register" className="auth-new-account-link">
+        <Link to={redirectTo ? `/register?redirect=${encodeURIComponent(redirectTo)}` : '/register'} className="auth-new-account-link">
           Crear cuenta
         </Link>
       </div>

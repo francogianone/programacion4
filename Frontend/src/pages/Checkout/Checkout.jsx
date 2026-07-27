@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useCart } from '../../context/CartContext.jsx';
+import ModalPagoMP from '../../components/Checkout/ModalPagoMP.jsx';
 import './Checkout.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-const COSTO_ENVIO = 2000;
 
 const DATOS_BANCARIOS = {
   alias: 'mi.tienda.alias',
@@ -18,19 +18,96 @@ const factVacia = { nombre: '', dni: '', domicilio: '' };
 const envioVacio = { domicilio: '', localidad: '', provincia: '', cp: '' };
 
 function Checkout() {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, clearCart, cotizacionEnvio, envioSeleccionado, guardarCotizacion } = useCart();
   const navigate = useNavigate();
 
   const [facturacion, setFacturacion] = useState(factVacia);
   const [metodoPago, setMetodoPago] = useState('efectivo');
-  const [tipoEntrega, setTipoEntrega] = useState('retiro');
+  const [tipoEntrega, setTipoEntrega] = useState(envioSeleccionado?.tipo || 'retiro');
   const [datosEnvio, setDatosEnvio] = useState(envioVacio);
   const [usarDatosFact, setUsarDatosFact] = useState(false);
   const [procesando, setProcesando] = useState(false);
   const [confirmacion, setConfirmacion] = useState(null);
   const [error, setError] = useState('');
+  const [modalMP, setModalMP] = useState(null);
 
-  const costoEnvio = tipoEntrega === 'envio' ? COSTO_ENVIO : 0;
+  // Scroll al inicio al montar el componente
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Referencia a la ventana de Mercado Pago
+  const ventanaMPRef = useRef(null);
+  // Intervalo para monitorear localStorage
+  const monitorRef = useRef(null);
+
+  // Cotización local del checkout (se actualiza al cambiar el CP)
+  const [cotizacionLocal, setCotizacionLocal] = useState(cotizacionEnvio);
+
+  // Cotización efectiva: local primero, contexto después
+  const cotizacionEfectiva = cotizacionLocal || cotizacionEnvio;
+
+  // Monitorear localStorage para detectar pago aprobado desde la otra pestaña
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === 'mp_pago_aprobado' && e.newValue) {
+        clearCart();
+        setModalMP(null);
+        if (ventanaMPRef.current) ventanaMPRef.current.close();
+        localStorage.removeItem('mp_pago_aprobado');
+        navigate('/mis-compras');
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearCart, navigate]);
+
+  // Recotizar automáticamente cuando el CP cambia a 4 dígitos
+  useEffect(() => {
+    const cpActual = usarDatosFact ? (cotizacionEnvio?.cp || '') : datosEnvio.cp;
+    if (!cpActual || !/^\d{4}$/.test(cpActual)) return;
+
+    // Si es el mismo CP que ya tenemos cotizado, no recotizar
+    if (cotizacionLocal?.cp === cpActual) return;
+    if (!cotizacionLocal && cotizacionEnvio?.cp === cpActual) return;
+
+    let cancelado = false;
+
+    const cotizar = async () => {
+      try {
+        const [resEnvio, resCorreo] = await Promise.all([
+          axios.get(`${API_URL}/api/ordenes/cotizar-envio`, { params: { cp: cpActual, tipoEntrega: 'envio' } }),
+          axios.get(`${API_URL}/api/ordenes/cotizar-envio`, { params: { cp: cpActual, tipoEntrega: 'correo' } }),
+        ]);
+        if (cancelado) return;
+        const data = {
+          cp: cpActual,
+          zona: resEnvio.data.zona,
+          envio: resEnvio.data,
+          correo: resCorreo.data
+        };
+        setCotizacionLocal(data);
+        guardarCotizacion(data);
+      } catch {
+        // No hacemos nada, mantenemos la cotización anterior
+      }
+    };
+
+    cotizar();
+    return () => { cancelado = true; };
+  }, [datosEnvio.cp, usarDatosFact]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Obtener costo de envío desde la cotización efectiva
+  const getCostoEnvio = () => {
+    if (!cotizacionEfectiva) return 0;
+    if (tipoEntrega === 'retiro') return 0;
+    if (tipoEntrega === 'envio') return cotizacionEfectiva.envio?.costoEnvio || 0;
+    if (tipoEntrega === 'correo') return cotizacionEfectiva.correo?.costoEnvio || 0;
+    return 0;
+  };
+
+  const costoEnvio = getCostoEnvio();
   const total = cartTotal + costoEnvio;
 
   useEffect(() => {
@@ -52,9 +129,11 @@ function Checkout() {
     setError('');
     setProcesando(true);
 
+    const cpCotizado = cotizacionEfectiva?.cp || cotizacionEnvio?.cp || '';
+
     const envioPayload = usarDatosFact
-      ? { domicilio: facturacion.domicilio, localidad: '', provincia: '', cp: '' }
-      : datosEnvio;
+      ? { domicilio: facturacion.domicilio, localidad: '', provincia: '', cp: cpCotizado }
+      : { ...datosEnvio, cp: datosEnvio.cp || cpCotizado };
 
     try {
       const payload = {
@@ -66,10 +145,50 @@ function Checkout() {
         metodoPago,
         tipoEntrega,
         datosFacturacion: facturacion,
-        ...(tipoEntrega === 'envio' && { datosEnvio: envioPayload })
+        ...((tipoEntrega === 'envio' || tipoEntrega === 'correo') && { datosEnvio: envioPayload })
       };
 
       const res = await axios.post(`${API_URL}/api/ordenes`, payload);
+
+      console.log('[Checkout] Respuesta del backend:', res.data);
+      console.log('[Checkout] initPoint:', res.data.initPoint);
+
+      // Si es Mercado Pago, abrir en nueva pestaña y mostrar modal
+      if (metodoPago === 'mercadopago' && res.data.initPoint) {
+        const urlDePago = res.data.initPoint;
+        console.log('[Checkout] Abriendo Mercado Pago en nueva pestaña:', urlDePago);
+
+        // NO vaciar el carrito aún — se vacía cuando el pago es aprobado
+        // Abrir en nueva pestaña
+        const ventanaMP = window.open(urlDePago, '_blank', 'noopener,noreferrer');
+        ventanaMPRef.current = ventanaMP;
+
+        // Mostrar modal de procesando pago
+        setModalMP({ ordenId: res.data._id, url: urlDePago });
+
+        // Monitorear si la ventana de MP se cierra
+        monitorRef.current = setInterval(() => {
+          if (ventanaMP && ventanaMP.closed) {
+            // La ventana se cerró — verificar si hubo pago aprobado
+            const pagoAprobado = localStorage.getItem('mp_pago_aprobado');
+            if (!pagoAprobado) {
+              setModalMP((prev) => prev ? { ...prev, ventanaCerrada: true } : null);
+            }
+            clearInterval(monitorRef.current);
+            monitorRef.current = null;
+          }
+        }, 1000);
+
+        setProcesando(false);
+        return;
+      }
+
+      if (metodoPago === 'mercadopago' && !res.data.initPoint) {
+        setError(
+          'No se pudo generar el link de pago de Mercado Pago. El pedido fue registrado pero deberás contactar al vendedor para coordinar el pago.'
+        );
+      }
+
       clearCart();
       setConfirmacion({ orden: res.data, metodoPago, emailNotificado: res.data.emailNotificado !== false });
     } catch (err) {
@@ -79,6 +198,43 @@ function Checkout() {
     }
   };
 
+  // Modal de Mercado Pago
+  const handleCancelarPagoMP = () => {
+    if (ventanaMPRef.current && !ventanaMPRef.current.closed) {
+      ventanaMPRef.current.close();
+    }
+    if (monitorRef.current) {
+      clearInterval(monitorRef.current);
+      monitorRef.current = null;
+    }
+    setModalMP(null);
+  };
+
+  const handlePagoExitoso = () => {
+    // Prevenir que el useEffect de carrito vacío redirija a /carrito
+    // Marcando confirmacion antes de clearCart
+    setConfirmacion({ orden: { _id: 'mp_pagado' }, metodoPago: 'mercadopago', emailNotificado: true });
+    localStorage.removeItem('mp_pago_aprobado');
+    setModalMP(null);
+    if (ventanaMPRef.current) ventanaMPRef.current.close();
+    clearCart();
+    navigate('/mis-compras', { replace: true });
+  };
+
+  if (modalMP) {
+    return (
+      <div className="checkout-page">
+        <ModalPagoMP
+          url={modalMP.url}
+          ordenId={modalMP.ordenId}
+          ventanaCerrada={modalMP.ventanaCerrada || false}
+          onCancelar={handleCancelarPagoMP}
+          onPagoExitoso={handlePagoExitoso}
+        />
+      </div>
+    );
+  }
+
   if (confirmacion) {
     return (
       <div className="checkout-confirmacion">
@@ -86,7 +242,7 @@ function Checkout() {
           <div className="checkout-confirmacion__icon">✓</div>
           <h2>¡Pedido recibido!</h2>
           <p className="checkout-confirmacion__sub">
-            Tu pedido <strong>#{confirmacion.orden._id.slice(-8).toUpperCase()}</strong> fue registrado correctamente.
+            Tu pedido <strong>#{confirmacion.orden._id.slice(-6).toUpperCase()}</strong> fue registrado correctamente.
           </p>
 
           {!confirmacion.emailNotificado && (
@@ -189,6 +345,18 @@ function Checkout() {
                 />
                 Transferencia bancaria
               </label>
+              <label className={`checkout-radio-option${metodoPago === 'mercadopago' ? ' checkout-radio-option--active' : ''}`}>
+                <input
+                  type="radio"
+                  value="mercadopago"
+                  checked={metodoPago === 'mercadopago'}
+                  onChange={() => setMetodoPago('mercadopago')}
+                />
+                Mercado Pago{' '}
+                <span className="checkout-radio-option__tag checkout-radio-option__tag--mp">
+                  Débito / Crédito
+                </span>
+              </label>
             </div>
           </section>
 
@@ -205,6 +373,20 @@ function Checkout() {
                 />
                 Retiro en local <span className="checkout-radio-option__tag">Sin costo</span>
               </label>
+              <label className={`checkout-radio-option${tipoEntrega === 'correo' ? ' checkout-radio-option--active' : ''}`}>
+                <input
+                  type="radio"
+                  value="correo"
+                  checked={tipoEntrega === 'correo'}
+                  onChange={() => setTipoEntrega('correo')}
+                />
+                Retiro en correo{' '}
+                <span className="checkout-radio-option__tag">
+                  {cotizacionEfectiva?.correo
+                    ? `+$${cotizacionEfectiva.correo.costoEnvio.toLocaleString('es-AR')}`
+                    : 'Cotizar en carrito'}
+                </span>
+              </label>
               <label className={`checkout-radio-option${tipoEntrega === 'envio' ? ' checkout-radio-option--active' : ''}`}>
                 <input
                   type="radio"
@@ -212,11 +394,16 @@ function Checkout() {
                   checked={tipoEntrega === 'envio'}
                   onChange={() => setTipoEntrega('envio')}
                 />
-                Envío a domicilio <span className="checkout-radio-option__tag">+${COSTO_ENVIO.toLocaleString('es-AR')}</span>
+                Envío a domicilio{' '}
+                <span className="checkout-radio-option__tag">
+                  {cotizacionEfectiva?.envio
+                    ? `+$${cotizacionEfectiva.envio.costoEnvio.toLocaleString('es-AR')}`
+                    : 'Cotizar en carrito'}
+                </span>
               </label>
             </div>
 
-            {tipoEntrega === 'envio' && (
+            {(tipoEntrega === 'envio' || tipoEntrega === 'correo') && (
               <div className="checkout-envio-form">
                 <label className="checkout-checkbox">
                   <input
@@ -230,7 +417,7 @@ function Checkout() {
                 {!usarDatosFact && (
                   <>
                     <div className="form-group">
-                      <label>Domicilio de envío</label>
+                      <label>Domicilio de {tipoEntrega === 'correo' ? 'facturación (sucursal de correo)' : 'envío'}</label>
                       <input
                         name="domicilio"
                         type="text"
@@ -266,13 +453,20 @@ function Checkout() {
                         <input
                           name="cp"
                           type="text"
-                          value={datosEnvio.cp}
+                          value={datosEnvio.cp || (cotizacionEfectiva?.cp || '')}
                           onChange={handleEnvioChange}
-                          placeholder="1414"
+                          placeholder="3260"
+                          required
                         />
                       </div>
                     </div>
                   </>
+                )}
+
+                {usarDatosFact && (
+                  <p className="checkout-envio-cp-info">
+                    Se usará el CP cotizado: <strong>{cotizacionEfectiva?.cp || 'No cotizado'}</strong>
+                  </p>
                 )}
               </div>
             )}
@@ -285,7 +479,11 @@ function Checkout() {
             className="btn-primary checkout-submit-btn"
             disabled={procesando || cartItems.length === 0}
           >
-            {procesando ? 'Procesando...' : 'Realizar pedido'}
+            {procesando
+              ? 'Procesando...'
+              : metodoPago === 'mercadopago'
+                ? 'Pagar con Mercado Pago'
+                : 'Realizar pedido'}
           </button>
         </form>
 

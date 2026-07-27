@@ -27,6 +27,7 @@ function AdminOrdenes() {
 
   useEffect(() => {
     cargarOrdenes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleEstado = async (id, estado) => {

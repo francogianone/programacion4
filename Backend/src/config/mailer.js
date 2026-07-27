@@ -1,25 +1,35 @@
 const nodemailer = require('nodemailer');
 
+const modo = process.env.NODE_ENV === 'despliegue' ? 'despliegue' : 'produccion';
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.GMAIL_USER,
     pass: process.env.GMAIL_PASS
   },
-  connectionTimeout: 5000,
-  greetingTimeout: 5000,
-  socketTimeout: 5000
+  ...(modo === 'despliegue'
+    ? { connectionTimeout: 5000, greetingTimeout: 5000, socketTimeout: 5000 }
+    : { connectionTimeout: 30000, greetingTimeout: 30000, socketTimeout: 30000 })
 });
 
-// Envuelve sendMail con un timeout de seguridad para evitar que quede
-// colgado cuando el host bloquea SMTP (ej: Render plan gratuito).
-const sendMailSafe = (opciones) =>
-  Promise.race([
-    transporter.sendMail(opciones),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Timeout al enviar email (SMTP bloqueado)')), 8000)
-    )
-  ]);
+/**
+ * Envia un email usando el transporte configurado.
+ * En modo despliegue (Render) usa un timeout de seguridad de 8s para no colgarse
+ * cuando el host bloquea SMTP saliente.
+ * En modo produccion (local) envia normalmente sin timeout artificial.
+ */
+const enviarMail = (opciones) => {
+  if (modo === 'despliegue') {
+    return Promise.race([
+      transporter.sendMail(opciones),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout al enviar email (SMTP bloqueado)')), 8000)
+      )
+    ]);
+  }
+  return transporter.sendMail(opciones);
+};
 
 const escapeHtml = (str) =>
   String(str)
@@ -57,7 +67,7 @@ const enviarConfirmacionPedido = async (emailDestino, orden) => {
   const pagoLabel =
     orden.metodoPago === 'transferencia' ? 'Transferencia bancaria' : 'Efectivo';
 
-  await transporter.sendMail({
+  await enviarMail({
     from: `"Libreria" <${process.env.GMAIL_USER}>`,
     to: emailDestino,
     subject: `Recibimos tu pedido (#${orden._id.toString().slice(-6).toUpperCase()})`,
@@ -127,7 +137,7 @@ const enviarActualizacionEstado = async (emailDestino, orden) => {
   const entregaLabel = orden.tipoEntrega === 'envio' ? 'Envio a domicilio' : 'Retiro en local';
   const ordenId = orden._id.toString().slice(-6).toUpperCase();
 
-  await transporter.sendMail({
+  await enviarMail({
     from: `"Libreria" <${process.env.GMAIL_USER}>`,
     to: emailDestino,
     subject: `Actualizacion de tu pedido #${ordenId}`,
@@ -160,7 +170,7 @@ const enviarActualizacionEstado = async (emailDestino, orden) => {
 
 module.exports = {
   transporter,
-  sendMailSafe,
+  enviarMail,
   enviarConfirmacionPedido,
   enviarActualizacionEstado
 };

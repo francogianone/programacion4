@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import CartItem from '../../components/Cart/CartItem';
 import CartSummary from '../../components/Cart/CartSummary';
 import OrderSummary from '../../components/Cart/OrderSummary';
+import CotizadorEnvio from '../../components/Cart/CotizadorEnvio';
 import '../../components/Cart/Cart.css';
 
 function Cart() {
@@ -11,7 +12,8 @@ function Cart() {
 
   useEffect(() => {
     syncCartStock();
-  }, [syncCartStock]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const validItems = cartItems.filter(item => !item.agotado);
 
@@ -41,6 +43,7 @@ function Cart() {
         {validItems.length > 0 && (
           <aside className="cart-sidebar">
             <OrderSummary />
+            <CotizadorEnvio />
             <CartSummary />
           </aside>
         )}

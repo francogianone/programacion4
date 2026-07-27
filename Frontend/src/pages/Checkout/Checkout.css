@@ -304,3 +304,59 @@
   color: #3b82f6;
   margin-top: 8px;
 }
+
+/* ── CP info cuando se usa domicilio de facturación ── */
+.checkout-envio-cp-info {
+  font-size: 0.82rem;
+  color: var(--text-muted, #666);
+  padding: 6px 0;
+}
+
+/* ── Tag Mercado Pago ── */
+.checkout-radio-option__tag--mp {
+  color: #009ee3;
+  font-weight: 700;
+}
+
+/* ── PagoResultado ── */
+.pago-resultado .checkout-confirmacion__icon {
+  font-size: 2rem;
+}
+
+.pago-resultado__orden-info {
+  background: #f8fafc;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  padding: 14px 18px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.pago-resultado__orden-info p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: var(--text-main, #1a1a1a);
+}
+
+.pago-resultado__acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.pago-resultado .btn-secondary {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid var(--border, #e0e0e0);
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background: var(--card-bg, #fff);
+  transition: border-color 0.15s;
+}
+
+.pago-resultado .btn-secondary:hover {
+  border-color: var(--primary, #2563eb);
+}

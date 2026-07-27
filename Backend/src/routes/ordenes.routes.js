@@ -7,8 +7,16 @@ const {
   obtenerMisOrdenes,
   obtenerOrdenes,
   obtenerOrdenPorId,
-  actualizarEstadoOrden
+  actualizarEstadoOrden,
+  cotizarEnvioHandler,
+  verificarPago
 } = require('../controllers/ordenes.controller');
+
+// Ruta pública de cotización (sin auth, accesible desde el carrito)
+router.get('/cotizar-envio', cotizarEnvioHandler);
+
+// Verificación de pago de Mercado Pago (requiere auth)
+router.get('/verificar-pago/:preferenceId', autenticar, verificarPago);
 
 router.post('/', autenticar, crearOrden);
 router.get('/mis-compras', autenticar, obtenerMisOrdenes);
